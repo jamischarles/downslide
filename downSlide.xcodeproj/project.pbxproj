@@ -12,6 +12,10 @@
 		507964AB218AABE700EFA7A2 /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507964AA218AABE700EFA7A2 /* Document.swift */; };
 		507964AD218AABE700EFA7A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 507964AC218AABE700EFA7A2 /* Assets.xcassets */; };
 		507964B0218AABE700EFA7A2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 507964AE218AABE700EFA7A2 /* Main.storyboard */; };
+		507964B9218AD4E500EFA7A2 /* ThumbViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507964B8218AD4E500EFA7A2 /* ThumbViewController.swift */; };
+		507964BB218AD51900EFA7A2 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507964BA218AD51900EFA7A2 /* DetailViewController.swift */; };
+		507964BE218AD63E00EFA7A2 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507964BC218AD63E00EFA7A2 /* Slide.swift */; };
+		507964BF218AD63E00EFA7A2 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507964BD218AD63E00EFA7A2 /* Slide.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +27,10 @@
 		507964AF218AABE700EFA7A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		507964B1218AABE700EFA7A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		507964B2218AABE700EFA7A2 /* downSlide.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = downSlide.entitlements; sourceTree = "<group>"; };
+		507964B8218AD4E500EFA7A2 /* ThumbViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbViewController.swift; sourceTree = "<group>"; };
+		507964BA218AD51900EFA7A2 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		507964BC218AD63E00EFA7A2 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slide.swift; sourceTree = "<group>"; };
+		507964BD218AD63E00EFA7A2 /* Slide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Slide.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,8 +66,12 @@
 				507964A6218AABE700EFA7A2 /* AppDelegate.swift */,
 				507964A8218AABE700EFA7A2 /* ViewController.swift */,
 				507964AA218AABE700EFA7A2 /* Document.swift */,
+				507964B8218AD4E500EFA7A2 /* ThumbViewController.swift */,
+				507964BA218AD51900EFA7A2 /* DetailViewController.swift */,
 				507964AC218AABE700EFA7A2 /* Assets.xcassets */,
 				507964AE218AABE700EFA7A2 /* Main.storyboard */,
+				507964BC218AD63E00EFA7A2 /* Slide.swift */,
+				507964BD218AD63E00EFA7A2 /* Slide.xib */,
 				507964B1218AABE700EFA7A2 /* Info.plist */,
 				507964B2218AABE700EFA7A2 /* downSlide.entitlements */,
 			);
@@ -127,6 +139,7 @@
 			files = (
 				507964AD218AABE700EFA7A2 /* Assets.xcassets in Resources */,
 				507964B0218AABE700EFA7A2 /* Main.storyboard in Resources */,
+				507964BF218AD63E00EFA7A2 /* Slide.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,7 +152,10 @@
 			files = (
 				507964A9218AABE700EFA7A2 /* ViewController.swift in Sources */,
 				507964A7218AABE700EFA7A2 /* AppDelegate.swift in Sources */,
+				507964BB218AD51900EFA7A2 /* DetailViewController.swift in Sources */,
+				507964BE218AD63E00EFA7A2 /* Slide.swift in Sources */,
 				507964AB218AABE700EFA7A2 /* Document.swift in Sources */,
+				507964B9218AD4E500EFA7A2 /* ThumbViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
