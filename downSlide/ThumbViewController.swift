@@ -29,6 +29,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     override func awakeFromNib() {
         
         print("### AWAKE FROM NIB")
+   
         //self.collectionView
         // This only sort of works in grid view... but for width instead of height
         
@@ -39,7 +40,20 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
     }
     
+ 
+    // Hacky way to access the file data for now...
+    // LATER: use bindings and fancy ways to do this. for now this hacky way works fine
+    var document: Document {
+        let oughtToBeDocument = view.window?.windowController?.document as? Document
+        assert(oughtToBeDocument != nil, "Unable to find the document for this view controller.")
+        return oughtToBeDocument!
+    }
     
+    // proper time to access the data in document... !!!! YES!!!
+    //
+    override func viewWillAppear() {
+        print("document.slides", document.slides)
+    }
     
     
     

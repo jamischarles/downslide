@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/Document.swift"
-            timestampString = "562890828.984113"
+            timestampString = "562892575.660758"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
+            startingLineNumber = "87"
+            endingLineNumber = "87"
             landmarkName = "read(from:ofType:)"
             landmarkType = "7">
          </BreakpointContent>

@@ -9,8 +9,13 @@
 import Cocoa
 
 class Document: NSDocument {
+    //v​a​r​ slides​:​ ​[NSView]​ ​=​ ​[​]
+    // make all the slides here...
+    var slides: [Slide] = []
     
     var fileContent = "Nothing yet :("
+    
+    
 
     override init() {
         super.init()
@@ -84,6 +89,9 @@ class Document: NSDocument {
 //        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
     }
 
+    
+    // FIXME: Where do we put the parsing logic? Maybe make a slideParsing class? Yes I think so!!!
+    
     
     func getFileContent() -> String {
         return self.fileContent
