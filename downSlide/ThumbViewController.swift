@@ -15,6 +15,10 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     @IBOutlet var collectionView: NSCollectionView!
     
+ 
+    
+    var fileContent = ""
+    
     // make all the slides here...
     var slides: [NSView] = []
     
@@ -23,6 +27,8 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     // http://wiresareobsolete.com/2010/03/awakefromnib/
     override func awakeFromNib() {
+        
+        print("### AWAKE FROM NIB")
         //self.collectionView
         // This only sort of works in grid view... but for width instead of height
         
@@ -33,9 +39,17 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
     }
     
+    
+    
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("### ViewDidLoad")
+        //print("document content", document.getFileContent())
         // Do view setup here.
+       
         slides.append(makeFormattedView(title: "We just changed tables to divs"))
         slides.append(makeFormattedView(title: "Sweet 2nd slide!"))
         slides.append(makeFormattedView(title: "Noice! 3rd slide!!!"))
@@ -47,6 +61,43 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         }
         
         
+        //guard let splitVC = parent as? NSSplitViewController else { return }
+        //let splitVC = parent as? NSSplitViewController
+        
+        
+        print("#### FILEVIEWCONENT", fileContent)
+        
+        // NOT WORKING :(
+        /*
+        var document: Document {
+            let oughtToBeDocument = self.view.window?.windowController?.document as? Document
+            assert(oughtToBeDocument != nil, "Unable to find the document for this view controller.")
+            return oughtToBeDocument!
+        }*/
+        
+        
+        
+        
+        //print("document content", document.getFileContent())
+        
+    }
+    
+    
+    func changeFileContent(str: String) {
+        self.fileContent = str
+        print("#### self.fileContent", self.fileContent)
+        
+        
+        
+        view.updateLayer()
+    }
+    
+    
+    // TODO: rethink if we should create objects here, or create a model that can be shared by the document and this?
+    // READ this to figure that out...
+    // https://developer.apple.com/library/archive/documentation/DataManagement/Conceptual/DocBasedAppProgrammingGuideForOSX/Designing/Designing.html
+    func populateStringFromFile(str: String) {
+        print("str inside the fn", str)
     }
     
     
@@ -58,8 +109,8 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     // TODO: name it slidePhoto?
     // assign EACH collectionViewItem
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        let item = collectionView.makeItem(withIdentifier: NSUserInterfaceItemIdentifier("Slide"), for: indexPath)
-        guard let slideItem = item as? Slide else { return item }
+        let item = collectionView.makeItem(withIdentifier: NSUserInterfaceItemIdentifier("SlideThumb"), for: indexPath)
+        guard let slideItem = item as? SlideThumb else { return item }
         
         slideItem.view.wantsLayer = true
         slideItem.view.layer?.backgroundColor = NSColor.red.cgColor
@@ -88,7 +139,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {
             //let item = indexPaths[0].item
             print("indexes", collectionView.item(at: 1))
-            let item = collectionView.item(at: 1) as? Slide
+            let item = collectionView.item(at: 1) as? SlideThumb
             
             // TODO: selecetd from outlet
             

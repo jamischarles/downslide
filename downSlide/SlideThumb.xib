@@ -30,6 +30,6 @@
                 <constraint firstAttribute="bottom" secondItem="VbD-bI-lsM" secondAttribute="bottom" id="iGA-gH-8nP"/>
             </constraints>
         </customView>
-        <collectionViewItem id="2Ve-6j-Au7" customClass="Slide" customModule="downSlide" customModuleProvider="target"/>
+        <customObject id="5KW-Vy-TUZ" customClass="SlideThumb" customModule="downSlide" customModuleProvider="target"/>
     </objects>
 </document>

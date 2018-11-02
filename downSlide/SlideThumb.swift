@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class Slide: NSCollectionViewItem {
+class SlideThumb: NSCollectionViewItem {
     
     let selectedBorderThickness: CGFloat = 3
     var index: IndexPath = [0,0]
