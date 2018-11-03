@@ -6,12 +6,18 @@
 //  Copyright © 2018 Charles, Jamis. All rights reserved.
 //
 
+// This is basically the master window controller
+// it accesses the file, then creates a new window, and the main viewController from the storyboard
+//
+
 import Cocoa
 
 class Document: NSDocument {
     //v​a​r​ slides​:​ ​[NSView]​ ​=​ ​[​]
     // make all the slides here...
-    var slides: [Slide] = []
+    // TODO: Use Slide Class? Any point in doing that?
+    var slides: [NSView] = []
+    
     
     var fileContent = "Nothing yet :("
     
@@ -35,14 +41,14 @@ class Document: NSDocument {
         self.addWindowController(windowController)
         
         // create reference to the textView inside the window we just created by opening the new file...
-        let vc = windowController.contentViewController as! NSSplitViewController
-        //vc.splitViewItems[0] = "testing 123" // assign dummy text for now, so we can change it later when content is read in...
-        
-        let thumb = vc.childViewControllers[0] as? ThumbViewController
-        
-        // SO HACKY, but for now we can reach in...
-        thumb?.changeFileContent(str: "IT WORKED SO HACkY BUT YES IT WORKED")
-        
+//        let vc = windowController.contentViewController as! NSSplitViewController
+//        //vc.splitViewItems[0] = "testing 123" // assign dummy text for now, so we can change it later when content is read in...
+//        
+//        let thumb = vc.childViewControllers[0] as? ThumbViewController
+//        
+//        // SO HACKY, but for now we can reach in...
+//        thumb?.changeFileContent(str: "IT WORKED SO HACkY BUT YES IT WORKED")
+//        
  
         // Q: Why do we have to assign anything now?
     
@@ -83,7 +89,11 @@ class Document: NSDocument {
 //                        //return Data()
 //                    }
         
-        fileContent = "This is my file content :)"
+        // TODO: move this to separate file?
+        fileContent = (try String(data: data, encoding: .utf8))!
+        slides = getSlidesFromContentString(rawString: fileContent)
+        Swift.print("after read slides.count", slides.count)
+        //let s =
         
         Swift.print("### file read\n")
 //        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
