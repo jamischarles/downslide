@@ -42,6 +42,16 @@ private func parseStringToSlideView(_ str: String) -> NSView {
     print("###########do something#############")
     //let view = NSView();
     
+    
+    // TOOD: this is where we'll make the important decisions
+    // What is the style of the slide?
+    // Slide BG Color?
+    // Title font size
+    // Q: Can we have different themes just be different functions that are called?
+    // or at least for what kinds of slides within a theme...?
+        // Q: How many types of slides should there be in a given theme? How should those be laid out?
+        // If we can use the primary layout mechanism that would be ideal...
+    
     let title = str.components(separatedBy: "\n")[0] // just take first line for now...
     
     return makeFormattedView(title: title)

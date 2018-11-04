@@ -13,6 +13,8 @@
 import Cocoa
 
 class Document: NSDocument {
+    
+    var isUntitledDoc = true
     //v​a​r​ slides​:​ ​[NSView]​ ​=​ ​[​]
     // make all the slides here...
     // TODO: Use Slide Class? Any point in doing that?
@@ -34,10 +36,22 @@ class Document: NSDocument {
     }
 
     override func makeWindowControllers() {
+        let docWindow = "Document Window Controller"
+        let defaultStartWindow = "Default Start Window Controller"
+        
+        var windowToUse = docWindow
+        
+        // load a different window if no file has been loaded...
+        if isUntitledDoc == true {
+            windowToUse = defaultStartWindow
+        }
+        
         Swift.print("### MAKING WINDOW CONTROLLER")
+        
+        Swift.print("isUntitleDoc", isUntitledDoc)
         // Returns the Storyboard that contains your Document window.
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("Document Window Controller")) as! NSWindowController
+        let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(windowToUse)) as! NSWindowController
         self.addWindowController(windowController)
         
         // create reference to the textView inside the window we just created by opening the new file...
@@ -74,6 +88,7 @@ class Document: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
+        isUntitledDoc = false
         Swift.print("#### READING FILE")
         // Insert code here to read your document from the given data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning false.
         // You can also choose to override readFromFileWrapper:ofType:error: or readFromURL:ofType:error: instead.
