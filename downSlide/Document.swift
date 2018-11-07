@@ -14,6 +14,8 @@ import Cocoa
 
 class Document: NSDocument {
     
+    //var fw: FileWrapper = FileWrapper(
+    
     var isUntitledDoc = true
     //v​a​r​ slides​:​ ​[NSView]​ ​=​ ​[​]
     // make all the slides here...
@@ -21,13 +23,23 @@ class Document: NSDocument {
     var slides: [NSView] = []
     
     
+    
+    
     var fileContent = "Nothing yet :("
     
     
 
     override init() {
-        super.init()
+        
         // Add your subclass-specific initialization here.
+        super.init()
+        
+       
+        
+        
+        
+        
+        
     }
     
 
@@ -87,6 +99,7 @@ class Document: NSDocument {
         throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
     }
 
+
     override func read(from data: Data, ofType typeName: String) throws {
         isUntitledDoc = false
         Swift.print("#### READING FILE")
@@ -110,10 +123,58 @@ class Document: NSDocument {
         Swift.print("after read slides.count", slides.count)
         //let s =
         
+        let fw:FileWrapper
+        
+        do {
+            fw = try fileWrapper(ofType: self.fileType!)
+            //fileWrapper(dat)
+        } catch {
+            Swift.print("#### failed")
+            //return results
+        }
+        
         Swift.print("### file read\n")
 //        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        
+        //self.fw = try self.fileWrapper(ofType: self.fileType!)
+        
+        //self.fileWrapper(data(ofType: <#T##String#>))
     }
 
+    
+    
+    // called more often than expected, so we should run a diff on the reloading...
+    // https://stackoverflow.com/questions/20586652/detect-overwritten-file-using-nsdocument
+    
+    override func presentedItemDidChange() {
+        Swift.print("FILE WAS CHANGED")
+       
+
+        // move the slide updating to the main thread (since we cannot update UI elements on bg thread).
+        // helps avoid weird bugs!!!
+        DispatchQueue.main.async {
+            self.getNewestSlidesFromContentAndNotify()
+        }
+ 
+        
+    }
+    
+    // FIXME: Change name to something better...
+    func getNewestSlidesFromContentAndNotify() {
+        readDataFromFile(anURL: self.fileURL!)
+        
+        
+        if let vc = self.windowControllers[0].contentViewController as? NSSplitViewController {
+            let thumb = vc.childViewControllers[0] as? ThumbViewController
+            thumb?.slidesHaveUpdated()
+            //return vc.textView.string.data(using: String.Encoding.utf8) ?? Data()
+        }
+        else {
+            //return Data()
+        }
+    }
+    
+    //override func readFromData:ofType:error:
     
     // FIXME: Where do we put the parsing logic? Maybe make a slideParsing class? Yes I think so!!!
     
@@ -121,6 +182,41 @@ class Document: NSDocument {
     func getFileContent() -> String {
         return self.fileContent
     }
+    
+    // pass in the url, and return the new content string
+    // TODO: add logic for checking if the string has changed
+    // TODO: add logic for checking lastModificationData so we aren't calling this unnecessarily often
+    func readDataFromFile(anURL: URL) -> Data {
+     
+        let aHandle:FileHandle
+        let fileContents:Data
+        
+        
+        do {
+            aHandle = try FileHandle(forReadingFrom: anURL)
+            fileContents = aHandle.readDataToEndOfFile() as Data
+            let newContent = (try String(data: fileContents, encoding: .utf8))!
+            
+            Swift.print("newContent", newContent)
+            fileContent = newContent
+            slides = getSlidesFromContentString(rawString: fileContent) // generate new slides
+            return fileContents;
+        } catch  {
+            Swift.print("ERROR")
+        }
+        
+        
+            // fileHandleForReadingFromURL:anURL error:nil];
+        
+    
+        //if (aHandle) {
+        
+        //}
+    
+        return Data()
+        
+    }
+    
 
 }
 

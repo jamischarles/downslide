@@ -16,9 +16,6 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     @IBOutlet var collectionView: NSCollectionView!
     
     
- 
-    
-    var fileContent = ""
     
     // make all the slides here...
     var slides: [NSView] = []
@@ -26,20 +23,10 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     // TODO: make this a struct? and have an array of slide scrcts?
     var slideThumbs: [NSImage] = []
     
-    // http://wiresareobsolete.com/2010/03/awakefromnib/
-    override func awakeFromNib() {
-        
-        print("### AWAKE FROM NIB")
-   
-        //self.collectionView
-        // This only sort of works in grid view... but for width instead of height
-        
-        // DOES NOT WORK
-        //        self.collectionView.enclosingScrollView?.bounds.size.width = 300
-        //      self.collectionView.enclosingScrollView?.bounds.size.height = 300
-        
-        
-    }
+    // keep track of currently selected thumb so we can re-select it after reload due to file change
+    var currentSelectedThumbs: Set<IndexPath>! // will only be one, but it's a set of selection
+    
+
     
  
     // Hacky way to access the file data for now...
@@ -76,6 +63,45 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         collectionView.reloadData()
     }
     
+    func slidesHaveUpdated() {
+        slides = document.slides
+        
+        // wipe out slide thumbs
+        slideThumbs = []
+        
+        
+        for slide in slides {
+            slideThumbs.append(slide.image())
+            //slideThumbs.append(slides[1].image())
+        }
+        
+        // reload sidebar data
+        collectionView.reloadData()
+        
+        // reload the currently active master slide (reload the same index)
+        // TODO: get current active from controllerViewItem?
+        
+        /*
+        guard let splitVC = self.parent as? NSSplitViewController else { return }
+        if let detail = splitVC.childViewControllers[1] as? DetailViewController {
+            detail.swapView(newView: slides[2] as NSView!)
+        }
+         */
+        // FIXME BUG: change the scroll position to be dynamic to the prior selection
+        // https://stackoverflow.com/questions/35207364/how-do-i-programmatically-select-an-object-and-have-that-object-show-as-selecte
+        
+        // reset selection in sidebar
+        collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
+        
+        // reload the currently displayed slide (if any? Maybe just force current selection)
+        let currentSlideIndex = currentSelectedThumbs.first?.item // get currently selected index
+        guard let splitVC = self.parent as? NSSplitViewController else { return }
+        if let detail = splitVC.childViewControllers[1] as? DetailViewController {
+            detail.swapView(newView: slides[currentSlideIndex!] as NSView!)
+        }
+        
+    }
+    
     
     
     
@@ -98,8 +124,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         //guard let splitVC = parent as? NSSplitViewController else { return }
         //let splitVC = parent as? NSSplitViewController
         
-        
-        print("#### FILEVIEWCONENT", fileContent)
+    
         
         // NOT WORKING :(
         /*
@@ -116,23 +141,13 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
     }
     
-    
-    func changeFileContent(str: String) {
-        self.fileContent = str
-        print("#### self.fileContent", self.fileContent)
-        
-        
-        
-        view.updateLayer()
-    }
-    
-    
+
     // TODO: rethink if we should create objects here, or create a model that can be shared by the document and this?
     // READ this to figure that out...
     // https://developer.apple.com/library/archive/documentation/DataManagement/Conceptual/DocBasedAppProgrammingGuideForOSX/Designing/Designing.html
-    func populateStringFromFile(str: String) {
-        print("str inside the fn", str)
-    }
+//    func populateStringFromFile(str: String) {
+//        print("str inside the fn", str)
+//    }
     
     
     // Q: How many rows?
@@ -157,6 +172,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         slideItem.imageView?.image = slideThumbs[i] // set image thumbnail
         
         
+        print("### CYCLE collectionView")
         
         
         
@@ -183,6 +199,8 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
             
             detail.swapView(newView: slides[i!] as! NSView!)
             
+            // save current selection indexPath (only need first, since we only allow 1 selection)
+            currentSelectedThumbs = indexPaths
         }
     }
     
