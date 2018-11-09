@@ -9,6 +9,11 @@
 // Utils responsible for taking the md string and turning it into NSViews that can be rendered to the user
 
 // NOT a class. This is a model. This file will only contain functionality. Not actual data. Will not be used to create objects
+
+
+// TODO: make a model / class for making the text elements...
+// h1() h2() h3(), where we pass in styles, and text
+
 import Foundation
 import Cocoa // for NSView
 
@@ -62,17 +67,68 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
         // Q: How many types of slides should there be in a given theme? How should those be laid out?
         // If we can use the primary layout mechanism that would be ideal...
     
-    let title = str.components(separatedBy: "\n")[0] // just take first line for now...
+    //let title = str.components(separatedBy: "\n")[0] // just take first line for now...
     
-    return makeFormattedView(title: title, bgColor: globalConfig.bgColor)
+    // all the lines
+    let slideLines = str.components(separatedBy: "\n")
     
-    let textField = NSTextField(string: str)
+    
+    // views that'll be in the NSStackView
+    var viewsArr: [NSView] = []
+    
+    for (i, line) in slideLines.enumerated() {
+        viewsArr.append(makeTextField(content: line))
+      
+    }
+    
+    // this method seems to respect the constraints better than by calling addArrangedView() or addSubView(), or addView()
+    // we can probably make the other way work, but we need to apply the constraints differently there
+    let stackView = NSStackView(views: viewsArr)
+    
+    
+    // make them take up an equal amount of space
+    stackView.distribution = .fillEqually
+    
+    // make the views line up vertically
+    stackView.orientation = .vertical
+    
+    stackView.wantsLayer = true
+    // set slide bg color
+    //stackView.layer?.backgroundColor = bgColor.cgColor
+    stackView.layer?.backgroundColor = globalConfig.bgColor.cgColor
+    
+    //return makeFormattedView(title: "Boom!", bgColor: globalConfig.bgColor)
+    
+    return stackView
+    
+    //return makeFormattedView(title: title, bgColor: globalConfig.bgColor)
+    
+    //let textField = NSTextField(string: str)
     
     //view.addSubview(textField)
     
-    let stackView = NSStackView(views: [textField])
+    //let stackView = NSStackView(views: [textField])
     
-    return stackView
+    //return stackView
+}
+
+// turns string into textField...
+func makeTextField(content: String) ->  NSTextField {
+    
+    // if H1, return textfield with H1 styles
+    let html = "<h1>\(content)</h1>"
+    
+    // TODO: pass this in from the global styles? or from the inline styles...?
+    let styles = "text-align: justified; line-height: 155px; text-indent: 350px; color: #ffffff; color: rgb(106, 215, 152); font-size: 72px; font-family: Futura; font-weight: bold; text-transform: uppercase;"
+    
+    let data = Data(html.utf8)
+
+    let NSAttrStr = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
+    
+    
+    let field = NSTextField(labelWithAttributedString: NSAttrStr!)
+    
+    return field
 }
 
 
@@ -242,6 +298,8 @@ func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
 
 // converts a config string (from markdown) into a config object...
 // FIXME: is there a better data structure I can use?
+// FIXME: Use ASTs, or parse the css into an object or nsdictionary I can use...
+// I don't want to write a bunch of regexes for this...
 func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     
     // TODO: see if we can cut off the parts after closing ```
@@ -258,6 +316,9 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     let isRgb = regex.firstMatch(in: configStr, options: [], range: range) != nil
     
     
+    let res = parseCSSIntoDict(cssStr: "")
+    print("RESULT####", res)
+    
     
     if isRgb {
         let rgbGroups = configStr.capturedGroups(withRegex: "background-color: rgb\\((.*)\\);?")
@@ -272,7 +333,75 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
         return config
     }
     
+    
 }
+
+// ######################
+// UTIL FUNCTIONS
+// ######################
+
+// CSS string -> NSDict of key value strings
+func parseCSSIntoDict(cssStr: String) -> NSMutableDictionary {
+    let cssStr = """
+.main-slide {
+    color: rgb(106, 215, 152)
+    background-color: #333
+    background-color: rgb(1,22,39);
+}
+
+.normal-slide {
+    color: rgb(106, 215, 152)
+    background-color: #333
+    background-color: rgb(1,22,39);
+}
+"""
+    
+    // split string into rules.
+    // for each match, first group is a class-rule, 2nd group is the rule details between the braces {}
+    let result = cssStr.capturedGroups(withRegex: "(\\..+?) ?\\{(.*?)\\}")
+    //print("result", result)
+    
+    var CSSObj = NSMutableDictionary()
+    
+    for (i, item) in result.enumerated() {
+        var cssSelector = "" // css selector
+        var cssRules: NSMutableDictionary
+        // if even number
+        if i % 2 == 0 {
+            cssSelector = item.trim()
+            cssRules = parseCSSRules(ruleStr: result[i+1])
+            CSSObj[cssSelector] = cssRules
+        }
+    }
+    
+
+    return CSSObj
+    
+}
+
+// parses CSS rules into key value paired dictionary
+func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
+    // split into lines
+    let lines = ruleStr.split(separator: "\n")
+    var key = ""
+    var val = ""
+    
+    var dict = NSMutableDictionary()
+    
+    // split into key values
+    for line in lines {
+        let result = line.split(separator: ":")
+        key = String(result[0]).trim()
+        val = String(result[1]).trim()
+        dict[key] = val
+    }
+    // make dictionary
+    
+    print("dict", dict)
+    
+    return dict
+}
+
 
 // "1,22,39" -> NSColor
 func rgbStringToNSColor(rgbStr: String) -> NSColor {
@@ -333,24 +462,33 @@ extension String {
         
         var regex: NSRegularExpression
         do {
-            regex = try NSRegularExpression(pattern: pattern, options: [])
+            // modified options to allow scanning multi-line strings
+            regex = try NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators)
         } catch {
             return results
         }
         
         let matches = regex.matches(in: self, options: [], range: NSRange(location:0, length: self.count))
         
-        guard let match = matches.first else { return results }
+        //guard let match = matches.first else { return results }
         
-        let lastRangeIndex = match.numberOfRanges - 1
-        guard lastRangeIndex >= 1 else { return results }
-        
-        for i in 1...lastRangeIndex {
-            let capturedGroupIndex = match.range(at: i)
-            let matchedString = (self as NSString).substring(with: capturedGroupIndex)
-            results.append(matchedString)
+        // loop over ALL the matches, not just the first one (will work for multiple capture groups)
+        for match in matches {
+
+            let lastRangeIndex = match.numberOfRanges - 1
+            guard lastRangeIndex >= 1 else { return results }
+            
+            for i in 1...lastRangeIndex {
+                let capturedGroupIndex = match.range(at: i)
+                let matchedString = (self as NSString).substring(with: capturedGroupIndex)
+                results.append(matchedString)
+            }
         }
         
         return results
+    }
+    // TRIM
+    func trim() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

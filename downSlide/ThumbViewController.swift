@@ -90,10 +90,13 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         // FIXME BUG: change the scroll position to be dynamic to the prior selection
         // https://stackoverflow.com/questions/35207364/how-do-i-programmatically-select-an-object-and-have-that-object-show-as-selecte
         
-        // reset selection in sidebar
-        collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
+        // reset selection in sidebar. Causing bugs right now...
+        //collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
         
         // reload the currently displayed slide (if any? Maybe just force current selection)
+        
+        return
+        
         let currentSlideIndex = currentSelectedThumbs.first?.item // get currently selected index
         guard let splitVC = self.parent as? NSSplitViewController else { return }
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {

@@ -2,7 +2,7 @@
 // Should this be just a prop? Or is there value in this actually being css? compare and try both...
 
 .background-slide {
-    
+    color: rgb(106, 215, 152)
     background-color: #333
     background-color: rgb(1,22,39);
 
