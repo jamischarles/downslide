@@ -82,8 +82,16 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     //let title = str.components(separatedBy: "\n")[0] // just take first line for now...
     
+    var rawStr = str
+    // strip out config
+    // this mutates the string... Should I do that or something else?
+    rawStr.removingRegexMatches(pattern: "```\\w.*```", replaceWith: " ")
+    // trim newlines from top/bottom of string
+    let trimmedStr = rawStr.trim()
+    
+    
     // all the lines
-    let slideLines = str.components(separatedBy: "\n")
+    let slideLines = trimmedStr.components(separatedBy: "\n")
     
     
     // views that'll be in the NSStackView
@@ -532,4 +540,15 @@ extension String {
     func trim() -> String {
         return self.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+    
+    mutating func removingRegexMatches(pattern: String, replaceWith: String = "") {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+            let range = NSMakeRange(0, self.count)
+            self = regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
+        } catch {
+            return
+        }
+    }
+    
 }
