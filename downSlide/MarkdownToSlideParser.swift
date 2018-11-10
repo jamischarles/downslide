@@ -20,7 +20,20 @@ import Cocoa // for NSView
 // config for the whole file
 struct GlobalConfig {
     var bgColor: NSColor // theme bgcolor
+    //var color: NSColor // default text color
+    var normalTextStyle: String // default CSS string for normal text
+    // TODO: We'll have to figure out how to manage the cascade... Just do it in order, and ditch specifcity?
+    // Easiest would be to use obj merge... LATER!
 }
+
+// mirrors a stylesheet
+struct CSSObject : Codable {
+    
+}
+
+//func CSSRule() -> NSMutableDictionary {
+//
+//}
 
 // returns array of views
 // FIXME: If there's any state that the slide needs to hold onto, then we should really use "Slide" objects from "Slide" class
@@ -77,7 +90,8 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     var viewsArr: [NSView] = []
     
     for (i, line) in slideLines.enumerated() {
-        viewsArr.append(makeTextField(content: line))
+        // FIXME: reconcile the styles somewhere between global styles and overrides...
+        viewsArr.append(makeTextField(content: line, style: globalConfig.normalTextStyle))
       
     }
     
@@ -113,13 +127,13 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
 }
 
 // turns string into textField...
-func makeTextField(content: String) ->  NSTextField {
+func makeTextField(content: String, style: String) ->  NSTextField {
     
     // if H1, return textfield with H1 styles
-    let html = "<h1>\(content)</h1>"
+    let html = "<h1 style=\"\(style)\">\(content)</h1>"
     
     // TODO: pass this in from the global styles? or from the inline styles...?
-    let styles = "text-align: justified; line-height: 155px; text-indent: 350px; color: #ffffff; color: rgb(106, 215, 152); font-size: 72px; font-family: Futura; font-weight: bold; text-transform: uppercase;"
+    //let styles = "text-align: justified; line-height: 155px; text-indent: 350px; color: #ffffff; color: rgb(106, 215, 152); font-size: 72px; font-family: Futura; font-weight: bold; text-transform: uppercase;"
     
     let data = Data(html.utf8)
 
@@ -302,37 +316,44 @@ func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
 // I don't want to write a bunch of regexes for this...
 func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     
+    var isRgb = false
+    
     // TODO: see if we can cut off the parts after closing ```
     // keep only the codeFence part
     let configStr = rawStr.components(separatedBy: "```")[1]
     
     
+    
     // TODO: search for hex vs rgb
     // doubleslach to escape ( and ). Weird...
     
+    let cssObj:NSMutableDictionary = parseCSSIntoDict(cssStr: configStr)
+    
+    // FIXME: how can we simplify this? use a struct?
+    //let mainSlideRules =  cssObj[".background-slide"] as! NSMutableDictionary
+    let mainSlideRules =  cssObj[".normal-slide"] as! NSMutableDictionary
+    let normalTextRules = getStringFromDict(cssObj: cssObj[".normal-text"] as! NSMutableDictionary)
+    
+    let bgColor = mainSlideRules["background-color"] as! String
+    
+    
+    //let color = normalTextRules["color"] as! String
+    
+    
+    
+    
     // FIXME: make this match better
+    /*
     let range = NSRange(location: 0, length: configStr.utf16.count)
     let regex = try! NSRegularExpression(pattern: "background-color: rgb")
     let isRgb = regex.firstMatch(in: configStr, options: [], range: range) != nil
+ */
+
     
+    // TODO: 1 function to convert both types... Just pass that from here...
+    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), normalTextStyle: normalTextRules)
     
-    let res = parseCSSIntoDict(cssStr: "")
-    print("RESULT####", res)
-    
-    
-    if isRgb {
-        let rgbGroups = configStr.capturedGroups(withRegex: "background-color: rgb\\((.*)\\);?")
-        let config = GlobalConfig(bgColor: rgbStringToNSColor(rgbStr: rgbGroups[0]))
-        print("Choose RGB", config)
-        return config
-        
-    } else {
-        let hexGroups = configStr.capturedGroups(withRegex: "background-color: #(.*);?")
-        let config = GlobalConfig(bgColor: hexStringToNSColor(hex: hexGroups[0]))
-        print("Choose HEX", config)
-        return config
-    }
-    
+    return config
     
 }
 
@@ -342,25 +363,13 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
 
 // CSS string -> NSDict of key value strings
 func parseCSSIntoDict(cssStr: String) -> NSMutableDictionary {
-    let cssStr = """
-.main-slide {
-    color: rgb(106, 215, 152)
-    background-color: #333
-    background-color: rgb(1,22,39);
-}
-
-.normal-slide {
-    color: rgb(106, 215, 152)
-    background-color: #333
-    background-color: rgb(1,22,39);
-}
-"""
     
     // split string into rules.
     // for each match, first group is a class-rule, 2nd group is the rule details between the braces {}
     let result = cssStr.capturedGroups(withRegex: "(\\..+?) ?\\{(.*?)\\}")
     //print("result", result)
     
+    // FIXME: make this a struct?
     var CSSObj = NSMutableDictionary()
     
     for (i, item) in result.enumerated() {
@@ -374,12 +383,25 @@ func parseCSSIntoDict(cssStr: String) -> NSMutableDictionary {
         }
     }
     
+    //print("CSSObj", CSSObj)
 
     return CSSObj
+}
+
+// returns the rules, not the selector
+func getStringFromDict(cssObj: NSMutableDictionary) -> String {
+    var str = ""
+    for (key, value) in cssObj {
+        str += "\(key):\(value);"
+    }
     
+    return str
 }
 
 // parses CSS rules into key value paired dictionary
+// TODO: support commented out line "//"
+// TODO: Support empty line...
+// TODO: Don't crash on invalid CSS (give error of some sort on invalid css)
 func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
     // split into lines
     let lines = ruleStr.split(separator: "\n")
@@ -391,9 +413,12 @@ func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
     // split into key values
     for line in lines {
         let result = line.split(separator: ":")
-        key = String(result[0]).trim()
-        val = String(result[1]).trim()
-        dict[key] = val
+        // don't crash if line is empty
+        if (result.count > 1) {
+            key = String(result[0]).trim()
+            val = String(result[1]).trim()
+            dict[key] = val
+        }
     }
     // make dictionary
     
@@ -403,14 +428,30 @@ func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
 }
 
 
+func stringToNSColor(str: String) -> NSColor{
+    var isRgb = false
+    
+    if str.contains("rgb") {
+        isRgb = true
+    }
+    
+    if isRgb {
+        let rgbGroups = str.capturedGroups(withRegex: "rgb\\((.*)\\);?")
+        return rgbStringToNSColor(rgbStr: rgbGroups[0])
+    } else {
+        let hexGroups = str.capturedGroups(withRegex: "#(.*);?")
+        return hexStringToNSColor(hex: hexGroups[0])
+    }
+}
+
 // "1,22,39" -> NSColor
 func rgbStringToNSColor(rgbStr: String) -> NSColor {
     let values = rgbStr.split(separator: ",")
     
     // parse from string to int
-    let red = Int(String(values[0]))
-    let green = Int(String(values[1]))
-    let blue = Int(String(values[2]))
+    let red = Int(String(values[0]).trim())
+    let green = Int(String(values[1]).trim())
+    let blue = Int(String(values[2]).trim())
     
     //print("rgb: \(red),\(green),\(blue)")
     

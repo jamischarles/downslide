@@ -91,12 +91,13 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         // https://stackoverflow.com/questions/35207364/how-do-i-programmatically-select-an-object-and-have-that-object-show-as-selecte
         
         // reset selection in sidebar. Causing bugs right now...
+        // TODO: fixme
         //collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
         
+        
+        
+        //return
         // reload the currently displayed slide (if any? Maybe just force current selection)
-        
-        return
-        
         let currentSlideIndex = currentSelectedThumbs.first?.item // get currently selected index
         guard let splitVC = self.parent as? NSSplitViewController else { return }
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {
