@@ -10,18 +10,26 @@
 
 // NOT a class. This is a model. This file will only contain functionality. Not actual data. Will not be used to create objects
 
-
+// TODO: make a "themes" folder, and store themes in there, including a default base stylesheet
+// to be used in case there are no styles for certain things set by the user...
 // TODO: make a model / class for making the text elements...
 // h1() h2() h3(), where we pass in styles, and text
+// TODO: document the hard rules, and allow soft failures for everything else
+// TODO: Allow an error, or OUTPUT panel with output for the markdown... Or status updates. "There are errors"
 
 import Foundation
 import Cocoa // for NSView
 
 // config for the whole file
+// FIXME: change this to be more flexible!!!
 struct GlobalConfig {
     var bgColor: NSColor // theme bgcolor
     //var color: NSColor // default text color
-    var normalTextStyle: String // default CSS string for normal text
+    var defaultStyles: NSMutableDictionary // default CSS obj for normal text
+    var h1: NSMutableDictionary
+    var h2: NSMutableDictionary
+    var h3: NSMutableDictionary
+    //var normalTextStyle: String // default CSS string for normal text
     // TODO: We'll have to figure out how to manage the cascade... Just do it in order, and ditch specifcity?
     // Easiest would be to use obj merge... LATER!
 }
@@ -99,8 +107,8 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     for (i, line) in slideLines.enumerated() {
         // FIXME: reconcile the styles somewhere between global styles and overrides...
-        viewsArr.append(makeTextField(content: line, style: globalConfig.normalTextStyle))
-      
+        // FIXME: I hate passing down the global config obj so deep :(
+        viewsArr.append(makeTextField(content: line, globalConfig: globalConfig))
     }
     
     // this method seems to respect the constraints better than by calling addArrangedView() or addSubView(), or addView()
@@ -135,10 +143,24 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
 }
 
 // turns string into textField...
-func makeTextField(content: String, style: String) ->  NSTextField {
-    
+func makeTextField(content: String, globalConfig: GlobalConfig) ->  NSTextField {
+    var style = getStringFromDict(cssObj: globalConfig.defaultStyles)
     // if H1, return textfield with H1 styles
-    let html = "<h1 style=\"\(style)\">\(content)</h1>"
+    var html = "<h1 style=\"\(style)\">\(content)</h1>"
+    
+    //
+    if content.hasPrefix("###") {
+        html = h3(content: content, globalConfig: globalConfig)
+    } else if content.hasPrefix("##") {
+        html = h2(content: content, globalConfig: globalConfig)
+    } else if content.hasPrefix("#") {
+        // FIXME: inherit the global styles...
+        html = h1(content: content, globalConfig: globalConfig)
+    } else {
+        
+    }
+    
+    
     
     // TODO: pass this in from the global styles? or from the inline styles...?
     //let styles = "text-align: justified; line-height: 155px; text-indent: 350px; color: #ffffff; color: rgb(106, 215, 152); font-size: 72px; font-family: Futura; font-weight: bold; text-transform: uppercase;"
@@ -153,6 +175,46 @@ func makeTextField(content: String, style: String) ->  NSTextField {
     return field
 }
 
+// pass in local styles, or global styles?
+func h1(content: String, globalConfig: GlobalConfig) -> String {
+    // local style vs override style. Maybe we can just combine them and let the engine override it?
+    let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
+    let tagStyles = getStringFromDict(cssObj: globalConfig.h1)
+    let style = "\(defaultStyles) \(tagStyles)"
+    
+    // FIXME: Only replace this at beginning of line...
+    let trimContent = content.replacingOccurrences(of: "#", with: "")
+    return "<h1 style=\"\(style)\">\(trimContent)</h1>"
+}
+
+func h2(content: String, globalConfig: GlobalConfig) -> String {
+    // local style vs override style. Maybe we can just combine them and let the engine override it?
+    let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
+    let tagStyles = getStringFromDict(cssObj: globalConfig.h2)
+    let style = "\(defaultStyles) \(tagStyles)"
+    
+    // FIXME: Only replace this at beginning of line...
+    let trimContent = content.replacingOccurrences(of: "##", with: "")
+    return "<h2 style=\"\(style)\">\(trimContent)</h1>"
+}
+
+func h3(content: String, globalConfig: GlobalConfig) -> String {
+    // local style vs override style. Maybe we can just combine them and let the engine override it?
+    let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
+    let tagStyles = getStringFromDict(cssObj: globalConfig.h3)
+    let style = "\(defaultStyles) \(tagStyles)"
+    
+    // FIXME: Only replace this at beginning of line...
+    let trimContent = content.replacingOccurrences(of: "###", with: "")
+    return "<h3 style=\"\(style)\">\(trimContent)</h1>"
+}
+
+// figure out the style inheritance for this element...
+// figure out the proper string of styles for this element...
+// can we just hack it by stringing them together
+func inheritStyles() {
+    
+}
 
 // TODO: add code for generating the thumbnails... Put this somewhere else?
 
@@ -330,19 +392,28 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     // keep only the codeFence part
     let configStr = rawStr.components(separatedBy: "```")[1]
     
-    
-    
-    // TODO: search for hex vs rgb
-    // doubleslach to escape ( and ). Weird...
-    
+
     let cssObj:NSMutableDictionary = parseCSSIntoDict(cssStr: configStr)
     
     // FIXME: how can we simplify this? use a struct?
     //let mainSlideRules =  cssObj[".background-slide"] as! NSMutableDictionary
-    let mainSlideRules =  cssObj[".normal-slide"] as! NSMutableDictionary
-    let normalTextRules = getStringFromDict(cssObj: cssObj[".normal-text"] as! NSMutableDictionary)
     
-    let bgColor = mainSlideRules["background-color"] as! String
+    
+    let defaultSlideRules = cssObj[".default-slide"] as! NSMutableDictionary
+    // only meant for text
+    let defaultTextRules = cssObj[".default-text"] as! NSMutableDictionary
+    
+    // FIXME: replace this with a safe getter that will return error messages to the editor...
+    // then fallback to the base style sheet?
+    let h1Rules = cssObj[".h1"] as! NSMutableDictionary
+    let h2Rules = cssObj[".h2"] as! NSMutableDictionary
+    let h3Rules = cssObj[".h3"] as! NSMutableDictionary
+    
+    
+    //let mainSlideRules =  cssObj[".normal-slide"] as! NSMutableDictionary
+    //let normalTextRules = getStringFromDict(cssObj: cssObj[".normal-text"] as! NSMutableDictionary)
+    
+    let bgColor = defaultSlideRules["background-color"] as! String
     
     
     //let color = normalTextRules["color"] as! String
@@ -359,7 +430,8 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
 
     
     // TODO: 1 function to convert both types... Just pass that from here...
-    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), normalTextStyle: normalTextRules)
+    // FIXME: change this structure
+    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), defaultStyles: defaultTextRules, h1: h1Rules, h2: h2Rules, h3: h3Rules)
     
     return config
     
@@ -430,7 +502,7 @@ func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
     }
     // make dictionary
     
-    print("dict", dict)
+    //print("dict", dict)
     
     return dict
 }

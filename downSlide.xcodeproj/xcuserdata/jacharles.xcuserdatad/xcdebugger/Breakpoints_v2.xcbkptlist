@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.749315"
+            timestampString = "563607972.172017"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "519"
-            endingLineNumber = "519"
+            startingLineNumber = "592"
+            endingLineNumber = "592"
             landmarkName = "capturedGroups(withRegex:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -90,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.749846"
+            timestampString = "563607972.172388"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "340"
-            endingLineNumber = "340"
+            startingLineNumber = "399"
+            endingLineNumber = "399"
             landmarkName = "extractGlobalConfig(_:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.750213"
+            timestampString = "563607972.172644"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "395"
-            endingLineNumber = "395"
+            startingLineNumber = "468"
+            endingLineNumber = "468"
             landmarkName = "parseCSSIntoDict(cssStr:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.7505701"
+            timestampString = "563607972.172881"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "387"
-            endingLineNumber = "387"
+            startingLineNumber = "460"
+            endingLineNumber = "460"
             landmarkName = "parseCSSIntoDict(cssStr:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.7509249"
+            timestampString = "563607972.173118"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "363"
-            endingLineNumber = "363"
+            startingLineNumber = "436"
+            endingLineNumber = "436"
             landmarkName = "extractGlobalConfig(_:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.751282"
+            timestampString = "563607972.173353"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
+            startingLineNumber = "539"
+            endingLineNumber = "539"
             landmarkName = "rgbStringToNSColor(rgbStr:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -170,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.751647"
+            timestampString = "563607972.173589"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "364"
-            endingLineNumber = "364"
+            startingLineNumber = "437"
+            endingLineNumber = "437"
             landmarkName = "extractGlobalConfig(_:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -186,11 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.752017"
+            timestampString = "563607972.173824"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "424"
-            endingLineNumber = "424"
+            startingLineNumber = "497"
+            endingLineNumber = "497"
             landmarkName = "parseCSSRules(ruleStr:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -202,13 +202,61 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "563584249.75236"
+            timestampString = "563607972.174052"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
             landmarkName = "parseStringToSlideView(_:globalConfig:)"
             landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "downSlide/MarkdownToSlideParser.swift"
+            timestampString = "563607972.174263"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
+            landmarkName = "h1(content:globalConfig:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "downSlide/MarkdownToSlideParser.swift"
+            timestampString = "563607972.174462"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "400"
+            endingLineNumber = "400"
+            landmarkName = "extractGlobalConfig(_:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "downSlide/ThumbViewController.swift"
+            timestampString = "563607972.174672"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "103"
+            endingLineNumber = "103"
+            landmarkName = "slidesHaveUpdated()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -92,9 +92,15 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
         // reset selection in sidebar. Causing bugs right now...
         // TODO: fixme
-        //collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
         
         
+        // if no slide is selected trying to get the selection back...
+        // FIXME: SHould we just default to first slide?
+        if currentSelectedThumbs == nil {
+            return
+        }
+        
+        collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
         
         //return
         // reload the currently displayed slide (if any? Maybe just force current selection)
