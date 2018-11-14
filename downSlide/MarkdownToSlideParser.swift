@@ -29,6 +29,7 @@ struct GlobalConfig {
     var h1: NSMutableDictionary
     var h2: NSMutableDictionary
     var h3: NSMutableDictionary
+    var li: NSMutableDictionary
     //var normalTextStyle: String // default CSS string for normal text
     // TODO: We'll have to figure out how to manage the cascade... Just do it in order, and ditch specifcity?
     // Easiest would be to use obj merge... LATER!
@@ -36,6 +37,10 @@ struct GlobalConfig {
 
 // mirrors a stylesheet
 struct CSSObject : Codable {
+    
+}
+
+struct AST {
     
 }
 
@@ -90,12 +95,21 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     //let title = str.components(separatedBy: "\n")[0] // just take first line for now...
     
+    makeASTForSlide(strForSlide: str)
+    
     var rawStr = str
     // strip out config
     // this mutates the string... Should I do that or something else?
     rawStr.removingRegexMatches(pattern: "```\\w.*```", replaceWith: " ")
     // trim newlines from top/bottom of string
     let trimmedStr = rawStr.trim()
+    
+    
+    // categorize section as what kind of content it is
+    // code block, config block, notes block, content str (like bullet, heading)
+    
+    // TODO: Can I basically make an AST of the slide, so I can then have some metadata for each block and know how to process each one?
+
     
     
     // all the lines
@@ -142,6 +156,154 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     //return stackView
 }
 
+
+struct ASTNode {
+    var rawContent: String
+    var range: NSRange // the chars for the content
+    var type: String // config, code, content
+    var contentSubtype: String // "bullet, h1, h2, js"
+}
+
+// FIXME: make AST for whole doc?
+// for now we'll just make one for each slide
+// TODO Later: Use https://github.com/syntax-tree/mdast and follow that spec?
+// https://github.com/apple/swift-cmark look at this <--
+// https://remark.js.org/  (use these if we need special stuff we don't get from our quick and hacky way...
+// returns an array of tuples
+func makeASTForSlide(strForSlide str: String) -> [(type: String, lines: [String])] {
+    
+    // TODO: READ THIS, and think about what MD standards to adopt...
+    // https://stackoverflow.blog/2009/10/15/markdown-one-year-later/
+    // https://github.github.com/gfm/
+    
+    // TODO: make a struct for ast nodes...
+    
+    // config block
+    
+    // code block
+    
+    // content (1 line)? Can content be more than 1 line long? ie: Bullet list?!?
+    // should a block of content be considered 1 block or many blocks? For now, let's break them into just the separate blocks... A content block will be a content block until it runs into another kind of block, like notes...
+    
+    
+    // Q: How should I handle empty lines?!? Same as how html handles it? Or should we respect it? Lean towards respecting it...
+    
+    // LAZY approach. Anything that isn't in the special types, is of type "content"
+//    var regex: NSRegularExpression
+//    let pattern = ""
+//    do {
+//        // modified options to allow scanning multi-line strings
+//        regex = try NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators)
+//    } catch {
+//        return results
+//    }
+//
+//    let matches = regex.matches(in: self, options: [], range: NSRange(location:0, length: self.count))
+//
+    
+    // FIXME: this needs to be reworked so we ensure we categorize the entire string properly...
+    // that means instead of regex we need to start searching at the beginning of a line, then parse it into the opening / closing tags using ranges...
+    
+    // FIXME: can we just use lines? Or do we need to use char ranges?!?
+    // interesting things happen by lines...
+    
+    var blocks: [(type: String, lines: [String])] = []
+    
+    let lines = str.split(separator: "\n")
+    
+    //var isConfigBlock = false
+    //var configBlock: [String] // array of strings
+    
+    var insideBlock: Bool = false
+    // FIXME: Use while loop?
+    // Q: What if we just capture categories and ranges first?
+    
+    var lineBuffer: [String] = []
+    var currentBlockType: String = "" // when we open the block we can tag the type
+    
+    // process each line
+    for (i, line) in lines.enumerated() {
+        
+        //use the lines to break things up into groups..
+        if line.hasPrefix("```") { // FIXME: dist between config and code
+            
+            if insideBlock { // we've hit the end of a code/config block
+                var type: String
+                
+                lineBuffer.append(String(line))
+                
+                // end of a config/code block, so tag it and add it
+                blocks.append((type: currentBlockType, lines: lineBuffer) )
+                // clear the buffer, reset the array
+                insideBlock = false
+                lineBuffer.removeAll()
+            } else { // START of code/config block
+                // start of a code/config block, so flush the buffer and tag as content
+                if lineBuffer.count > 0 {
+                    blocks.append((type: "content", lines: lineBuffer) as! (type: String, lines: [String]))
+                    lineBuffer.removeAll() // flush the lineBuffer?
+                    
+                }
+                
+                insideBlock = true
+                lineBuffer.append(String(line)) // add the current line after possible flush
+                
+                // categorize the block as code, notes, config (based on the 2nd line of the block)
+                if lines[i+1].contains("config:theme") {
+                    currentBlockType = "config"
+                } else if lines[i].contains("```notes") {
+                    currentBlockType = "notes"
+                } else {
+                    currentBlockType = "code"
+                }
+            }
+  
+        } else {
+            // if not start/end block, then add the line whether content or config
+            lineBuffer.append(String(line))
+        }
+        
+    }
+    
+    // if we get to end, and there is still anything in the buffer, process that (like a trailing line of content)
+    if lineBuffer.count > 0 {
+        blocks.append((type: "content", lines: lineBuffer) as! (type: String, lines: [String]))
+        lineBuffer.removeAll() // flush the lineBuffer?
+    }
+    
+    //print("blocks", blocks)
+    
+    return blocks
+    
+    /*
+    let config = str.capturedGroups(withRegex: "(```\\w+ ?\nconfig:theme.*?```)")
+    // FIXME: just name it 'config.theme'?
+    let configNode = ASTNode(rawContent: config[0].str, range: config[0].range, type: "config", contentSubtype: "theme")
+    
+    let codeBlock = str.capturedGroups(withRegex: "(```\\w+ ?\nconfig:theme.*?```)")
+    // FIXME: just name it 'config.theme'?
+    let codeNode = ASTNode(rawContent: codeBlock[0].str, range: codeBlock[0].range, type: "config", contentSubtype: "theme")
+    
+    // FIXME: make this work for cases where we have content, then more code...
+    let contentStr = str[codeBlock[0].range.length
+    //let contentNode =
+    
+    print(codeBlock)
+ 
+ */
+    // TUPLE:
+    // - lines [0-4], lines: [start:4, end:9] (tuple)
+    // rawContent (string)
+    // type "config / code / content"
+    // contentSubtype "bullet, h1, h2, js"
+    
+    
+    // node will be of type tuple
+    // arrray of nodes...
+    // doc can be a collection / array of slides
+    
+}
+
 // turns string into textField...
 func makeTextField(content: String, globalConfig: GlobalConfig) ->  NSTextField {
     var style = getStringFromDict(cssObj: globalConfig.defaultStyles)
@@ -156,6 +318,8 @@ func makeTextField(content: String, globalConfig: GlobalConfig) ->  NSTextField 
     } else if content.hasPrefix("#") {
         // FIXME: inherit the global styles...
         html = h1(content: content, globalConfig: globalConfig)
+    } else if content.hasPrefix("-") {
+        html = li(content: content, globalConfig: globalConfig)
     } else {
         
     }
@@ -207,6 +371,17 @@ func h3(content: String, globalConfig: GlobalConfig) -> String {
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "###", with: "")
     return "<h3 style=\"\(style)\">\(trimContent)</h1>"
+}
+
+// bullets
+func li(content: String, globalConfig: GlobalConfig) -> String {
+    let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
+    let tagStyles = getStringFromDict(cssObj: globalConfig.li)
+    let style = "\(defaultStyles) \(tagStyles)"
+    
+    // FIXME: Only replace this at beginning of line...
+    let trimContent = content.replacingOccurrences(of: "-", with: "&#8226;")
+    return "<li style=\"\(style)\">\(trimContent)</li>"
 }
 
 // figure out the style inheritance for this element...
@@ -409,6 +584,8 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     let h2Rules = cssObj[".h2"] as! NSMutableDictionary
     let h3Rules = cssObj[".h3"] as! NSMutableDictionary
     
+    let liRules = cssObj[".li"] as! NSMutableDictionary
+    
     
     //let mainSlideRules =  cssObj[".normal-slide"] as! NSMutableDictionary
     //let normalTextRules = getStringFromDict(cssObj: cssObj[".normal-text"] as! NSMutableDictionary)
@@ -431,7 +608,7 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     
     // TODO: 1 function to convert both types... Just pass that from here...
     // FIXME: change this structure
-    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), defaultStyles: defaultTextRules, h1: h1Rules, h2: h2Rules, h3: h3Rules)
+    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), defaultStyles: defaultTextRules, h1: h1Rules, h2: h2Rules, h3: h3Rules, li: liRules)
     
     return config
     
@@ -457,8 +634,8 @@ func parseCSSIntoDict(cssStr: String) -> NSMutableDictionary {
         var cssRules: NSMutableDictionary
         // if even number
         if i % 2 == 0 {
-            cssSelector = item.trim()
-            cssRules = parseCSSRules(ruleStr: result[i+1])
+            cssSelector = item.str.trim()
+            cssRules = parseCSSRules(ruleStr: result[i+1].str)
             CSSObj[cssSelector] = cssRules
         }
     }
@@ -517,10 +694,10 @@ func stringToNSColor(str: String) -> NSColor{
     
     if isRgb {
         let rgbGroups = str.capturedGroups(withRegex: "rgb\\((.*)\\);?")
-        return rgbStringToNSColor(rgbStr: rgbGroups[0])
+        return rgbStringToNSColor(rgbStr: rgbGroups[0].str)
     } else {
         let hexGroups = str.capturedGroups(withRegex: "#(.*);?")
-        return hexStringToNSColor(hex: hexGroups[0])
+        return hexStringToNSColor(hex: hexGroups[0].str)
     }
 }
 
@@ -578,8 +755,9 @@ func hexStringToNSColor (hex:String) -> NSColor {
 // extend String with regex capture groups
 // https://samwize.com/2016/07/21/how-to-capture-multiple-groups-in-a-regex-with-swift/
 extension String {
-    func capturedGroups(withRegex pattern: String) -> [String] {
-        var results = [String]()
+    func capturedGroups(withRegex pattern: String) -> [(str: String, range: NSRange)] {
+        // returns tuple with "str" and "range" key
+        var results = [(str: String, range: NSRange)]()
         
         var regex: NSRegularExpression
         do {
@@ -602,7 +780,7 @@ extension String {
             for i in 1...lastRangeIndex {
                 let capturedGroupIndex = match.range(at: i)
                 let matchedString = (self as NSString).substring(with: capturedGroupIndex)
-                results.append(matchedString)
+                results.append((str: matchedString, range: capturedGroupIndex))
             }
         }
         

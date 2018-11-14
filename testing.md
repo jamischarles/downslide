@@ -23,6 +23,10 @@ config:theme
 .h3 {
     font-size: 22px
 }
+
+.li {
+    font-size: 22px
+}
 ```
 
 # Speaking to baby turtles
@@ -34,7 +38,19 @@ It is so the best ever
 - First bullet
 - second bullet
 - Third bullet
+
+```notes
+This is the best thing that's ever happened to me
+```
+
 ---
 ### Third slide is NOOO the best
 Secondary title on main slide
+
+```js
+console.log('the best thing evar!');
+alert('no way jose')
+```
+
+Even better?
 
