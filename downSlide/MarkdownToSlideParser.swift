@@ -95,14 +95,14 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     //let title = str.components(separatedBy: "\n")[0] // just take first line for now...
     
-    makeASTForSlide(strForSlide: str)
+    let blocks = makeASTForSlide(strForSlide: str)
     
-    var rawStr = str
+    //var rawStr = str
     // strip out config
     // this mutates the string... Should I do that or something else?
-    rawStr.removingRegexMatches(pattern: "```\\w.*```", replaceWith: " ")
+    //rawStr.removingRegexMatches(pattern: "```\\w.*```", replaceWith: " ")
     // trim newlines from top/bottom of string
-    let trimmedStr = rawStr.trim()
+    //let trimmedStr = rawStr.trim()
     
     
     // categorize section as what kind of content it is
@@ -112,17 +112,28 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
 
     
     
-    // all the lines
-    let slideLines = trimmedStr.components(separatedBy: "\n")
-    
-    
     // views that'll be in the NSStackView
     var viewsArr: [NSView] = []
     
-    for (i, line) in slideLines.enumerated() {
-        // FIXME: reconcile the styles somewhere between global styles and overrides...
-        // FIXME: I hate passing down the global config obj so deep :(
-        viewsArr.append(makeTextField(content: line, globalConfig: globalConfig))
+    // process all the blocks of types of content
+    for block in blocks {
+        
+        // don't process config, notes blocks
+        if block.type == "config" || block.type == "notes" {continue}
+        
+        // all the lines
+        //let slideLines = trimmedStr.components(separatedBy: "\n")
+        let slideLines = block.lines
+        
+        
+        
+        
+        for (i, line) in slideLines.enumerated() {
+            // FIXME: reconcile the styles somewhere between global styles and overrides...
+            // FIXME: I hate passing down the global config obj so deep :(
+            viewsArr.append(makeTextField(content: line, type: block.type, globalConfig: globalConfig))
+        }
+        
     }
     
     // this method seems to respect the constraints better than by calling addArrangedView() or addSubView(), or addView()
@@ -230,7 +241,7 @@ func makeASTForSlide(strForSlide str: String) -> [(type: String, lines: [String]
             if insideBlock { // we've hit the end of a code/config block
                 var type: String
                 
-                lineBuffer.append(String(line))
+                //lineBuffer.append(String(line))
                 
                 // end of a config/code block, so tag it and add it
                 blocks.append((type: currentBlockType, lines: lineBuffer) )
@@ -246,7 +257,7 @@ func makeASTForSlide(strForSlide str: String) -> [(type: String, lines: [String]
                 }
                 
                 insideBlock = true
-                lineBuffer.append(String(line)) // add the current line after possible flush
+                //lineBuffer.append(String(line)) // add the current line after possible flush
                 
                 // categorize the block as code, notes, config (based on the 2nd line of the block)
                 if lines[i+1].contains("config:theme") {
@@ -305,13 +316,17 @@ func makeASTForSlide(strForSlide str: String) -> [(type: String, lines: [String]
 }
 
 // turns string into textField...
-func makeTextField(content: String, globalConfig: GlobalConfig) ->  NSTextField {
+func makeTextField(content: String, type:String, globalConfig: GlobalConfig) ->  NSTextField {
     var style = getStringFromDict(cssObj: globalConfig.defaultStyles)
     // if H1, return textfield with H1 styles
     var html = "<h1 style=\"\(style)\">\(content)</h1>"
     
+    
+    
     //
-    if content.hasPrefix("###") {
+    if type == "code" {
+        html = code(content: content, globalConfig: globalConfig)
+    } else if content.hasPrefix("###") {
         html = h3(content: content, globalConfig: globalConfig)
     } else if content.hasPrefix("##") {
         html = h2(content: content, globalConfig: globalConfig)
@@ -382,6 +397,16 @@ func li(content: String, globalConfig: GlobalConfig) -> String {
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "-", with: "&#8226;")
     return "<li style=\"\(style)\">\(trimContent)</li>"
+}
+
+func code(content: String, globalConfig: GlobalConfig) -> String {
+    let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
+    let tagStyles = getStringFromDict(cssObj: globalConfig.li)
+    let style = "\(defaultStyles) \(tagStyles)"
+    
+    // FIXME: Only replace this at beginning of line...
+    let trimContent = content.replacingOccurrences(of: "-", with: "&#8226;")
+    return "<li style=\"\(style) color: #eee;\">\(trimContent)</li>"
 }
 
 // figure out the style inheritance for this element...
