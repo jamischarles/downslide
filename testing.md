@@ -31,6 +31,9 @@ config:theme
 
 # Speaking to baby turtles
 The best
+
+![alt text](babies.jpg)
+
 ---
 ## Love it much yes really
 It is so the best ever
@@ -43,14 +46,18 @@ It is so the best ever
 This is the best thing that's ever happened to me
 ```
 
+![alt text](images/photo.jpg)
+
 ---
 ### Third slide is NOOO the best
 Secondary title on main slide
 
 ```js
 console.log('the best thing evar!');
-alert('no way jose')
+alert('no way jose'
 ```
 
 Even better?
+
+![alt text](cat-small-face.jpg)
 

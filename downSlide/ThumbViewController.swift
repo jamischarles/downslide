@@ -40,6 +40,16 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     // proper time to access the data in document... !!!! YES!!!
     //
     override func viewWillAppear() {
+        
+        // select the folder for image rights
+        // FIXME: lazy load this later...
+        //NSOpenPanel().selectFolder
+        
+        // FIXME: check if we have permissions already...
+        loadSavedFolderAccessPermissions() // we'll need to check here and see if we have to ask for perms again
+//        askForProjectFolderPermissions()
+//        saveFolderAccessPermissions()
+        
         print("### VIEW WILL APPEAR")
         print("document.slides", document.slides)
         print("document.slides.count", document.slides.count)
@@ -119,6 +129,9 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         print("### ViewDidLoad")
         super.viewDidLoad()
         print("### ViewDidLoad")
+        
+        
+        
         //print("document content", document.getFileContent())
         // Do view setup here.
        

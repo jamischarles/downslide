@@ -20,9 +20,11 @@
 import Foundation
 import Cocoa // for NSView
 
+
 // config for the whole file
 // FIXME: change this to be more flexible!!!
 struct GlobalConfig {
+    var docUrl: URL // nsdocument file path for the md file that's open (needed to get relative image paths)
     var bgColor: NSColor // theme bgcolor
     //var color: NSColor // default text color
     var defaultStyles: NSMutableDictionary // default CSS obj for normal text
@@ -50,13 +52,12 @@ struct AST {
 
 // returns array of views
 // FIXME: If there's any state that the slide needs to hold onto, then we should really use "Slide" objects from "Slide" class
-func getSlidesFromContentString(rawString: String) -> [NSView] {
-    
+func getSlidesFromContentString(rawString: String, docUrl: URL) -> [NSView] {
     let stringsBySlide = splitFilecontentIntoStringsBySlide(rawString)
     
     // extract global config for the document (theme, styles, etc)
     // FIXME: Must the config be at the top?
-    let config = extractGlobalConfig(stringsBySlide[0])
+    let config = extractGlobalConfig(stringsBySlide[0], docUrl: docUrl) // FIXME: Just make docUrl a global in this file?
     
     
     var slides: [NSView] = []
@@ -126,12 +127,27 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
         let slideLines = block.lines
         
         
-        
+        //viewsArr.append(imageView)
         
         for (i, line) in slideLines.enumerated() {
             // FIXME: reconcile the styles somewhere between global styles and overrides...
             // FIXME: I hate passing down the global config obj so deep :(
-            viewsArr.append(makeTextField(content: line, type: block.type, globalConfig: globalConfig))
+            
+            // if line is an image, make an imageView instead... FIXME: Should this be here?
+            if line.hasPrefix("![") {
+                viewsArr.append(makeImageFromMDString(content: line, globalConfig: globalConfig))
+            } else {
+                viewsArr.append(makeTextField(content: line, type: block.type, globalConfig: globalConfig))
+            }
+            
+            
+            
+            
+            
+            // FIXME: distinguish if it's an image or text content...
+            // FIXME: quick and hacky just check for image type... We'll have to fix this later for other media types...
+            //viewsArr.append(imageView)
+            // make image
         }
         
     }
@@ -315,6 +331,43 @@ func makeASTForSlide(strForSlide str: String) -> [(type: String, lines: [String]
     
 }
 
+// turn MD string into image we can insert
+// FIXME: Need to get height/width and other config from the MD string, and from the global settings...
+func makeImageFromMDString(content: String, globalConfig: GlobalConfig) -> NSImageView {
+    // get filePath from string
+    
+    // FIXME: make this more flexible? Only allows for
+    // extract filepath from this string
+    // ![alt text](images/photo.jpg)  <-type of string
+    let results = content.capturedGroups(withRegex: "!\\[.*]\\((\\S+)\\)")
+    let filePath = results[0].str
+    
+    // expected to be relative to the NSDocument location...
+    // get path to open md file, and remove the file, keep the folder.
+    let docFilePath = globalConfig.docUrl.deletingLastPathComponent()
+    
+    // remove "file://" from beginning of docPath, so it'll work. FIXME: Find a method to do this?
+    let docPath = docFilePath.absoluteString.replacingOccurrences(of: "file://", with: "")
+    
+    let imageView = ImageViewFromMD()
+//    imageView.image = NSImage(contentsOfFile: "/Users/jacharles/Dropbox/dev/mac_playground/downSlide/cat-small-face.jpg")
+    
+    // FIXME: create more foolproof way of doing this. Like node has path joining methods
+    
+
+    imageView.wantsLayer = true
+    //imageView.bounds
+    imageView.frame = NSRect(x: 300, y: 300, width: 200, height: 200)
+    // set slide bg color
+    //stackView.layer?.backgroundColor = bgColor.cgColor
+    imageView.layer?.backgroundColor = NSColor.red.cgColor
+    
+    // set the image src
+    imageView.image = NSImage(contentsOfFile: "\(docPath)\(filePath)")
+    
+    return imageView
+}
+
 // turns string into textField...
 func makeTextField(content: String, type:String, globalConfig: GlobalConfig) ->  NSTextField {
     var style = getStringFromDict(cssObj: globalConfig.defaultStyles)
@@ -349,7 +402,9 @@ func makeTextField(content: String, type:String, globalConfig: GlobalConfig) -> 
     let NSAttrStr = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
     
     
+    
     let field = NSTextField(labelWithAttributedString: NSAttrStr!)
+    field.wantsLayer = true // needed for z-order (like z-index) of the images vs textfields
     
     return field
 }
@@ -399,6 +454,14 @@ func li(content: String, globalConfig: GlobalConfig) -> String {
     return "<li style=\"\(style)\">\(trimContent)</li>"
 }
 
+func img(content: String, globalConfig: GlobalConfig) -> NSImageView {
+    let imageView = NSImageView()
+    /* Set image property and replace name with your image file's name */
+    imageView.image = NSImage(named: NSImage.Name(rawValue: "YOUR_IMAGE_FILE_NAME_HERE"))
+    
+    return imageView
+}
+
 func code(content: String, globalConfig: GlobalConfig) -> String {
     let defaultStyles = getStringFromDict(cssObj: globalConfig.defaultStyles)
     let tagStyles = getStringFromDict(cssObj: globalConfig.li)
@@ -407,6 +470,7 @@ func code(content: String, globalConfig: GlobalConfig) -> String {
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "-", with: "&#8226;")
     return "<li style=\"\(style) color: #eee;\">\(trimContent)</li>"
+ 
 }
 
 // figure out the style inheritance for this element...
@@ -584,7 +648,7 @@ func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
 // FIXME: is there a better data structure I can use?
 // FIXME: Use ASTs, or parse the css into an object or nsdictionary I can use...
 // I don't want to write a bunch of regexes for this...
-func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
+func extractGlobalConfig(_ rawStr: String, docUrl: URL) -> GlobalConfig {
     
     var isRgb = false
     
@@ -633,7 +697,7 @@ func extractGlobalConfig(_ rawStr: String) -> GlobalConfig {
     
     // TODO: 1 function to convert both types... Just pass that from here...
     // FIXME: change this structure
-    let config = GlobalConfig(bgColor: stringToNSColor(str: bgColor), defaultStyles: defaultTextRules, h1: h1Rules, h2: h2Rules, h3: h3Rules, li: liRules)
+    let config = GlobalConfig(docUrl: docUrl, bgColor: stringToNSColor(str: bgColor), defaultStyles: defaultTextRules, h1: h1Rules, h2: h2Rules, h3: h3Rules, li: liRules)
     
     return config
     
@@ -827,3 +891,8 @@ extension String {
     }
     
 }
+
+
+
+
+

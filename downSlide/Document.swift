@@ -119,7 +119,7 @@ class Document: NSDocument {
         
         // TODO: move this to separate file?
         fileContent = (try String(data: data, encoding: .utf8))!
-        slides = getSlidesFromContentString(rawString: fileContent)
+        slides = getSlidesFromContentString(rawString: fileContent, docUrl: self.fileURL!)
         Swift.print("after read slides.count", slides.count)
         //let s =
         
@@ -162,6 +162,12 @@ class Document: NSDocument {
     // FIXME: Change name to something better...
     func getNewestSlidesFromContentAndNotify() {
         readDataFromFile(anURL: self.fileURL!)
+        // what is this actually doing?!? Where is the content being updated?!?
+        //readDataFromFile(anURL: URL(string: "file:///Users/jacharles/Dropbox/dev/mac_playground/downSlide/testing2.md")!)
+        
+        
+        
+        Swift.print("###self.fileURL", self.fileURL)
         
         
         if let vc = self.windowControllers[0].contentViewController as? NSSplitViewController {
@@ -197,12 +203,17 @@ class Document: NSDocument {
             fileContents = aHandle.readDataToEndOfFile() as Data
             let newContent = (try String(data: fileContents, encoding: .utf8))!
             
-            Swift.print("newContent", newContent)
+            Swift.print("###newContent", newContent)
             fileContent = newContent
-            slides = getSlidesFromContentString(rawString: fileContent) // generate new slides
+            slides = getSlidesFromContentString(rawString: fileContent, docUrl: self.fileURL!) // generate new slides
             return fileContents;
         } catch  {
-            Swift.print("ERROR")
+            Swift.print("ERROR", error)
+            
+            // FIXME: move this to a better place...
+            // FIXME: set it so I don't have to do this every time...
+            //NSOpenPanel().selectFolder
+            askForProjectFolderPermissions()
         }
         
         
@@ -219,4 +230,30 @@ class Document: NSDocument {
     
 
 }
+
+
+//https://stackoverflow.com/questions/28008262/detailed-instruction-on-use-of-nsopenpanel/28015428
+// extension to give permissions to find images in the folder...
+// FIXME: select default..
+//extension NSOpenPanel {
+//    var selectFolder: URL? {
+//        // accessory view?
+//        accessoryView = NSTextField(string: "ACCESSORYVIEW")
+//
+//
+//        // default one to select...
+//        directoryURL = URL(string:"/Users/jacharles/Dropbox/dev/")
+//
+//        title = "Select Folder for me..."
+//        message = "Downslide needs access to your project folder, so we import images etc..."
+//        nameFieldLabel = "this is the nameFieldLabel"
+//        prompt = "Grant permission to read/write to this folder."
+//        allowsMultipleSelection = false
+//        canChooseDirectories = true
+//        canChooseFiles = false
+//        canCreateDirectories = true
+//        //allowedFileTypes = ["jpg","png","pdf","pct", "bmp", "tiff"]  // to allow only images, just comment out this line to allow any file type to be selected
+//        return runModal() == .OK ? urls.first : nil
+//    }
+//}
 
