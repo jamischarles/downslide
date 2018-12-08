@@ -354,19 +354,100 @@ func makeImageFromMDString(content: String, globalConfig: GlobalConfig) -> NSIma
     
     // FIXME: create more foolproof way of doing this. Like node has path joining methods
     
-
-    imageView.wantsLayer = true
+    
+    
+    // https://stackoverflow.com/questions/23002653/nsimageview-image-aspect-fill
+//    imageView.layer = CALayer()
+    
+//    imageView.layer?.contentsGravity = kCAGravityResizeAspectFill
+//    imageView.layer?.contents = NSImage(contentsOfFile: "\(docPath)\(filePath)")
+//    imageView.wantsLayer = true
+    
     //imageView.bounds
-    imageView.frame = NSRect(x: 300, y: 300, width: 200, height: 200)
+    
+
     // set slide bg color
     //stackView.layer?.backgroundColor = bgColor.cgColor
     imageView.layer?.backgroundColor = NSColor.red.cgColor
     
+    
+    
+    
+    
     // set the image src
-    imageView.image = NSImage(contentsOfFile: "\(docPath)\(filePath)")
+    let img = NSImage(contentsOfFile: "\(docPath)\(filePath)")
+    
+    
+    
+    if let image = NSImage(contentsOfFile: "\(docPath)\(filePath)"){
+        let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+        
+        // does this even matter?
+        // PROPORTIONS ARE SET HERE!!!!. The width
+//        imageView.image = NSImage(cgImage: cgImage!, size: NSMakeSize(200, 400))
+        imageView.image = image
+        
+        // FIXME: use this to proportinally size down...
+        // This matters more than anything else... Including frame size for imageView
+        // his has proven to be the most reliable mechanism for sizing I've found so far.
+        // TODO: try to cache these later for better image perf in the file...
+        // setting parent view with frame size helps for clipping, but not for resizing the image...
+        imageView.image = resize(image: image, w: 200, h: 200)
+    }
+    
+    
+//    imageView.image = NSImage(contentsOfFile: "\(docPath)\(filePath)")
+    
+    imageView.image?.resizingMode = .tile
+    // FIXME: figure out how to fix the size and resize
+    imageView.imageScaling = .scaleProportionallyDown // no effect?
+//    imageView.image?.size = NSMakeSize(200, 200)
+//    imageView.setFrameSize(NSMakeSize(200,200))
+//    imageView.sizeToFit() // no effec
+    
+    
+    
+    // this sizing matters a lot too... Q: How do I make them both work together?
+    // this just seems to clip it... Can I just max this? And then use width/height to change the actual size?
+    
+    // THIS IS WHAT SETS IT!!!!
+    // does height even do anything here?!?! proportions are taken from image, then  scaled proportionally...
+    // APPEARS to weight towards the larger one... the other just goes along proportionally..
+    
+//    imageView.frame = NSRect(x: 300, y: 300, width: 300, height: 200) // matters a LOT
+    
+    //imageView.image = resize(image: imageView.image!, w: 200, h: 500)
+    
     
     return imageView
+    
+    // this is max size. imageView won't grow beyond this parent...
+//    let v = NSView(frame: NSMakeRect(0, 0, 800, 800))
+//    v.addSubview(imageView)
+    
+//    v.constraints
+    
+//    v.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
+//    v.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+    
+//    return v
+    
+    
+    
+//    return imageView
 }
+
+func resize(image: NSImage, w: Int, h: Int) -> NSImage {
+    var destSize = NSMakeSize(CGFloat(w), CGFloat(h))
+    var newImage = NSImage(size: destSize)
+    newImage.lockFocus()
+    image.draw(in: NSMakeRect(0, 0, destSize.width, destSize.height), from: NSMakeRect(0, 0, image.size.width, image.size.height), operation: NSCompositingOperation.sourceOver, fraction: CGFloat(1))
+    newImage.unlockFocus()
+    newImage.size = destSize
+    return newImage
+}
+
+
 
 // turns string into textField...
 func makeTextField(content: String, type:String, globalConfig: GlobalConfig) ->  NSTextField {

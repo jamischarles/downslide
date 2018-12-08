@@ -735,6 +735,21 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <toolbar key="toolbar" implicitIdentifier="6CD0F7C0-EB9F-4B38-AA79-0349A767C26B" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="lrw-bu-t5O">
+                            <allowedToolbarItems>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="OKg-L4-i9S"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="efk-c0-yn8"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarPrintItem" id="Hkf-c8-KlN"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="7ag-o1-nT2"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="xrU-se-3Iz"/>
+                            </allowedToolbarItems>
+                            <defaultToolbarItems>
+                                <toolbarItem reference="OKg-L4-i9S"/>
+                                <toolbarItem reference="efk-c0-yn8"/>
+                                <toolbarItem reference="xrU-se-3Iz"/>
+                                <toolbarItem reference="Hkf-c8-KlN"/>
+                            </defaultToolbarItems>
+                        </toolbar>
                         <connections>
                             <outlet property="delegate" destination="jGA-0Y-lOj" id="98r-iN-zZc"/>
                         </connections>
@@ -833,7 +848,46 @@
                     <view key="view" id="lRb-Jh-vnt">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Ut-zb-Fhs">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <clipView key="contentView" id="qyU-tJ-St3">
+                                    <rect key="frame" x="1" y="1" width="448" height="298"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <view translatesAutoresizingMaskIntoConstraints="NO" id="nEl-mo-i3R">
+                                            <rect key="frame" x="0.0" y="0.0" width="433" height="283"/>
+                                        </view>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="nEl-mo-i3R" secondAttribute="trailing" constant="15" id="4GY-Ol-US3"/>
+                                        <constraint firstItem="nEl-mo-i3R" firstAttribute="leading" secondItem="qyU-tJ-St3" secondAttribute="leading" id="Kct-Gf-QDo"/>
+                                        <constraint firstItem="nEl-mo-i3R" firstAttribute="top" secondItem="qyU-tJ-St3" secondAttribute="top" constant="15" id="bJf-dV-iWW"/>
+                                        <constraint firstAttribute="bottom" secondItem="nEl-mo-i3R" secondAttribute="bottom" id="dFW-6U-Oib"/>
+                                    </constraints>
+                                </clipView>
+                                <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="Z7K-K6-ADS">
+                                    <rect key="frame" x="1" y="283" width="448" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="sH7-rt-gxC">
+                                    <rect key="frame" x="433" y="1" width="16" height="298"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="6Ut-zb-Fhs" secondAttribute="bottom" id="MF1-0J-GeY"/>
+                            <constraint firstAttribute="trailing" secondItem="6Ut-zb-Fhs" secondAttribute="trailing" id="dT9-HN-oMZ"/>
+                            <constraint firstItem="6Ut-zb-Fhs" firstAttribute="leading" secondItem="lRb-Jh-vnt" secondAttribute="leading" id="gxA-Po-7rF"/>
+                            <constraint firstItem="6Ut-zb-Fhs" firstAttribute="top" secondItem="lRb-Jh-vnt" secondAttribute="top" id="uwt-FD-gVg"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="clipView" destination="qyU-tJ-St3" id="oaF-CU-5yD"/>
+                        <outlet property="mainView" destination="nEl-mo-i3R" id="iha-C5-wNZ"/>
+                        <outlet property="scrollView" destination="6Ut-zb-Fhs" id="izt-1X-mMR"/>
+                    </connections>
                 </viewController>
                 <customObject id="5N3-NL-oy1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

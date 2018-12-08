@@ -49,6 +49,11 @@ This is the best thing that's ever happened to me
 ![alt text](images/photo.jpg)
 
 ---
+# Slide with no image?
+
+What is this magic?
+
+---
 ### Third slide is NOOO the best
 Secondary title on main slide
 

@@ -13,6 +13,11 @@ class DetailViewController: NSViewController {
     
     var subView:NSView!
     
+    @IBOutlet var scrollView: NSScrollView!
+    
+    @IBOutlet var mainView: NSView!
+    @IBOutlet var clipView: NSClipView!
+    
     override func viewDidLoad() {
         let someView = NSTextField(labelWithString: "Default Placeholder View") as NSView!
         super.viewDidLoad()
@@ -20,8 +25,11 @@ class DetailViewController: NSViewController {
         
         
         
-        self.view.addSubview(someView!)
-        subView = someView
+        scrollView.documentView = someView
+        
+        scrollView.magnification = 1.0 // default
+        //clipView.addSubview(someView!)
+//        subView = someView
     }
     
     // FIXME: make the swapping way more elegant...
@@ -29,11 +37,29 @@ class DetailViewController: NSViewController {
         // because we are using "replace" instead of addSubview() it doesn't keep just adding more sibling views that stack
         // on top of each other. It removes the prior one with the assumption that the detail page should only show 1 view
         // at a time...
-        view.replaceSubview(self.subView, with: newView)
-        self.subView = newView
+//        clipView.replaceSubview(subView, with: newView)
+        
+        // prep clipping boundaries for new view about to be inserted
+        let viewToShowNext = NSView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
+         // overflow = hidden
+        
+        viewToShowNext.addSubview(newView)
+        
+        
+        scrollView.documentView = viewToShowNext
+//        self.subView = newView
         
         // I assume it has to be in the View tree before I can apply these constraints...
-        applySlideConstraints(slideView: self.subView as! NSStackView)
+        
+        // set size of view...
+        // Or bounds?
+        mainView.setFrameSize(NSMakeSize(1024.0, 768.0)) // 4:3 Aspec Ratio (standard)
+        mainView.setBoundsSize(NSMakeSize(1024.0, 768.0))
+        
+        newView.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
+        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+        
+//        applySlideConstraints(slideView: subView as! NSStackView)
         
     }
     
