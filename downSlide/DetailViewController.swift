@@ -8,6 +8,13 @@
 
 import Cocoa
 
+// needed because scrollView starts bottom left when zoomed out (lame. Expected to be top left).
+// is this a nice way to define multiple classes in same file? Could be amazing...
+// http://www.poweredbytim.co.uk/programming/nsscrollview-top-left-pinning-and-isflipped/
+// https://stackoverflow.com/questions/11975434/nsscrollview-scrolltotop
+class FlippedView: NSView {
+    override var isFlipped: Bool { return true }
+}
 
 class DetailViewController: NSViewController {
     
@@ -17,6 +24,7 @@ class DetailViewController: NSViewController {
     
     @IBOutlet var mainView: NSView!
     @IBOutlet var clipView: NSClipView!
+    
     
     override func viewDidLoad() {
         let someView = NSTextField(labelWithString: "Default Placeholder View") as NSView!
@@ -40,10 +48,11 @@ class DetailViewController: NSViewController {
 //        clipView.replaceSubview(subView, with: newView)
         
         // prep clipping boundaries for new view about to be inserted
-        let viewToShowNext = NSView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
+        let viewToShowNext = FlippedView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
          // overflow = hidden
         
         viewToShowNext.addSubview(newView)
+        
         
         
         scrollView.documentView = viewToShowNext
@@ -57,15 +66,48 @@ class DetailViewController: NSViewController {
         mainView.setBoundsSize(NSMakeSize(1024.0, 768.0))
         
         newView.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
-        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+        // this forces the content to change size to fit this constraint. Do NOT set nsstackview height
+        // via constraints. It needs to be set via the contents...
+//        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
         
-//        applySlideConstraints(slideView: subView as! NSStackView)
+//        applySlideConstraints(slideView: newView as! NSStackView, mainView: view)
+        
+        
+        // manual constraints?
+        newView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        newView.topAnchor.constraint(equalTo: (self.view.superview?.topAnchor)!).isActive = true
+        
+
+//        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+//        mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+        
+        // makes no diff? Can't tell...
+//        newView.setFrameSize(NSMakeSize(1024.0, 768.0))
+        
+        newView.translatesAutoresizingMaskIntoConstraints = false
+        
+        
         
     }
     
     // constraints we want applied as soon as the detail slide changes...
     // for most of these we constrain the slide's NSStackView to the parent detail view and the window
-    func applySlideConstraints(slideView:NSStackView) {
+    // they have to be part of the view hierarchy tree in order to be applied correctly (in most cases)
+    func applySlideConstraints(slideView:NSStackView, mainView: NSView) {
+        
+        
+        
+        slideView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+        slideView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true // don't center it, and limit the width
+        
+        slideView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
+        //stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        // set the width of the stackview container to 800 so things aren't cut off...
+        slideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
+        slideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
+        
+        /*
         
         
         // FIXME: Do we need to apply all the constraints and all these transformations when we show it only?
@@ -83,6 +125,9 @@ class DetailViewController: NSViewController {
         
         // left/right padding 50%
         slideView.edgeInsets = NSEdgeInsets(top:200,left:NSWidth(view.bounds) / 2, bottom: 200,right:NSWidth(view.bounds) / 2)
+ 
+ */
+ 
     }
     
 }

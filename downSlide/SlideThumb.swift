@@ -43,7 +43,7 @@ class SlideThumb: NSCollectionViewItem {
                 view.layer?.borderWidth = 0
             }
             
-            print("selected index", self.index)
+            //print("selected index", self.index)
         }
         
         

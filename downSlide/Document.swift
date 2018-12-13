@@ -102,7 +102,7 @@ class Document: NSDocument {
 
     override func read(from data: Data, ofType typeName: String) throws {
         isUntitledDoc = false
-        Swift.print("#### READING FILE")
+//        Swift.print("#### READING FILE")
         // Insert code here to read your document from the given data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning false.
         // You can also choose to override readFromFileWrapper:ofType:error: or readFromURL:ofType:error: instead.
         // If you override either of these, you should also override -isEntireFileLoaded to return false if the contents are lazily loaded.
@@ -120,7 +120,7 @@ class Document: NSDocument {
         // TODO: move this to separate file?
         fileContent = (try String(data: data, encoding: .utf8))!
         slides = getSlidesFromContentString(rawString: fileContent, docUrl: self.fileURL!)
-        Swift.print("after read slides.count", slides.count)
+//        Swift.print("after read slides.count", slides.count)
         //let s =
         
         let fw:FileWrapper
@@ -133,7 +133,7 @@ class Document: NSDocument {
             //return results
         }
         
-        Swift.print("### file read\n")
+//        Swift.print("### file read\n")
 //        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         
         //self.fw = try self.fileWrapper(ofType: self.fileType!)
@@ -147,7 +147,7 @@ class Document: NSDocument {
     // https://stackoverflow.com/questions/20586652/detect-overwritten-file-using-nsdocument
     
     override func presentedItemDidChange() {
-        Swift.print("FILE WAS CHANGED")
+//        Swift.print("FILE WAS CHANGED")
        
 
         // move the slide updating to the main thread (since we cannot update UI elements on bg thread).
@@ -167,7 +167,7 @@ class Document: NSDocument {
         
         
         
-        Swift.print("###self.fileURL", self.fileURL)
+//        Swift.print("###self.fileURL", self.fileURL)
         
         
         if let vc = self.windowControllers[0].contentViewController as? NSSplitViewController {
@@ -203,7 +203,7 @@ class Document: NSDocument {
             fileContents = aHandle.readDataToEndOfFile() as Data
             let newContent = (try String(data: fileContents, encoding: .utf8))!
             
-            Swift.print("###newContent", newContent)
+//            Swift.print("###newContent", newContent)
             fileContent = newContent
             slides = getSlidesFromContentString(rawString: fileContent, docUrl: self.fileURL!) // generate new slides
             return fileContents;

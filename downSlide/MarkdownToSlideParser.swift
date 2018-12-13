@@ -115,6 +115,7 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     // views that'll be in the NSStackView
     var viewsArr: [NSView] = []
+//    let stackView = NSStackView()
     
     // process all the blocks of types of content
     for block in blocks {
@@ -135,8 +136,12 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
             
             // if line is an image, make an imageView instead... FIXME: Should this be here?
             if line.hasPrefix("![") {
+//                stackView.addView(<#T##view: NSView##NSView#>, in: <#T##NSStackView.Gravity#>)
+//                stackView.addArrangedSubview(makeImageFromMDString(content: line, globalConfig: globalConfig))
                 viewsArr.append(makeImageFromMDString(content: line, globalConfig: globalConfig))
             } else {
+//                stackView.addView(makeTextField(content: line, type: block.type, globalConfig: globalConfig), in: .top)
+//                stackView.addArrangedSubview(makeTextField(content: line, type: block.type, globalConfig: globalConfig))
                 viewsArr.append(makeTextField(content: line, type: block.type, globalConfig: globalConfig))
             }
             
@@ -157,20 +162,76 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     let stackView = NSStackView(views: viewsArr)
     
     
-    // make them take up an equal amount of space
-    stackView.distribution = .fillEqually
+    let stack = NSStackView()
+    stack.setFrameSize(NSMakeSize(100, 100)) // has no effect?
+    stack.orientation = .vertical
+//    stack.alignment = .top
+    stack.distribution = .fill
+    stack.spacing = 8
+    stackView.wantsLayer = true
+    stack.layer?.backgroundColor = globalConfig.bgColor.cgColor
+    
+    for view in viewsArr {
+        stack.addArrangedSubview(view)
+    }
+    
+//    stack.addArrangedSubview(viewsArr[1])
+//    stack.addArrangedSubview(viewsArr[2])
+    
+    //stack.setHuggingPriority(.defaultLow, for: .vertical)
+    //stack.setContentHuggingPriority(.defaultLow, for: .vertical)
+    //stack.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+//    stack.setContentHuggingPriority(NSLayoutConstraint.Priority(1), for: .vertical)
+//    stack.setContentHuggingPriority(NSLayoutConstraint.Priority(1), for: .horizontal)
+//    stack.setContentCompressionResistancePriority(NSLayoutConstraint.Priority(1), for: .vertical)
+    
+//    viewsArr[0].setContentHuggingPriority(.defaultHigh, for: .vertical)
+    
+    
+    for view in stack.arrangedSubviews {
+//        view.setContentHuggingPriority(NSLayoutConstraint.Priority(10), for: .horizontal)
+//        view.setContentHuggingPriority(NSLayoutConstraint.Priority(10), for: .vertical)
+    }
+    
+    
+    
+    
+    
+//    viewsArr[0].setContentHuggingPriority(.fittingSizeCompression, for: .vertical)
+//    viewsArr[0].setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+    
+//    let stackView = NSStackView()
+//    stack.setViews(viewsArr, in: .top)
+    
+//    stackView.addView(viewsArr[0], in: .top)
+//    stackView.addSubview(viewsArr[0], positioned: .below, relativeTo: stackView)
+
+    
+    
+    // make them take up an equal amount of space (good for just a few, but not like the web, and not natural... provide this as an option?
+//    stackView.distribution = .fillEqually
+//    stackView.distribution = .fill // only big gap between first and subsequent...
     
     // make the views line up vertically
     stackView.orientation = .vertical
+    stackView.distribution = .fillEqually
+    stackView.alignment = .leading
+    
     
     stackView.wantsLayer = true
     // set slide bg color
     //stackView.layer?.backgroundColor = bgColor.cgColor
-    stackView.layer?.backgroundColor = globalConfig.bgColor.cgColor
+    
     
     //return makeFormattedView(title: "Boom!", bgColor: globalConfig.bgColor)
     
-    return stackView
+
+    // set this to false so we can create our own Auto Layout constraints
+    // this fixes the left rail breaking bonkers
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    
+//    return stackView
+    return stack
     
     //return makeFormattedView(title: title, bgColor: globalConfig.bgColor)
     
@@ -450,10 +511,10 @@ func resize(image: NSImage, w: Int, h: Int) -> NSImage {
 
 
 // turns string into textField...
-func makeTextField(content: String, type:String, globalConfig: GlobalConfig) ->  NSTextField {
+func makeTextField(content: String, type:String, globalConfig: GlobalConfig) ->  NSTextView {
     var style = getStringFromDict(cssObj: globalConfig.defaultStyles)
     // if H1, return textfield with H1 styles
-    var html = "<h1 style=\"\(style)\">\(content)</h1>"
+    var html = "<span style=\"\(style)\">\(content)</span>"
     
     
     
@@ -478,16 +539,60 @@ func makeTextField(content: String, type:String, globalConfig: GlobalConfig) -> 
     // TODO: pass this in from the global styles? or from the inline styles...?
     //let styles = "text-align: justified; line-height: 155px; text-indent: 350px; color: #ffffff; color: rgb(106, 215, 152); font-size: 72px; font-family: Futura; font-weight: bold; text-transform: uppercase;"
     
+    
+    
+    
+    /*
     let data = Data(html.utf8)
-
+     
     let NSAttrStr = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
-    
-    
-    
+     
     let field = NSTextField(labelWithAttributedString: NSAttrStr!)
     field.wantsLayer = true // needed for z-order (like z-index) of the images vs textfields
-    
     return field
+ */
+    
+    
+    let titleData = Data(html.utf8)
+    
+    
+    
+    // mutable so we can add paragraph styles...
+    let NSAttrStr = try? NSMutableAttributedString(data: titleData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
+    
+    
+    // textView instead of textField. Bc it gives more control
+    let textStorage:NSTextStorage = NSTextStorage(attributedString: NSAttrStr!)
+    let manager:NSLayoutManager = NSLayoutManager()
+    
+    // FIXME: this seems to be the width that matters...
+    
+    // if this is too small, it'll clip the tex inside...
+    let container:NSTextContainer = NSTextContainer(containerSize: NSMakeSize(800, 400))
+    // tie it all together so text shows up
+    textStorage.addLayoutManager(manager)
+    manager.addTextContainer(container)
+    
+    // appears to have no effect? These sizes don't seem to matter...
+    let windowFrame:NSRect = NSRect(x: 0, y: 0, width: 800, height: 200)
+    let textView:NSTextView = NSTextView(frame: windowFrame, textContainer: container)
+    //let lightBlue = NSColor(red:79/255, green:191/255, blue:203/255, alpha:1.000)
+    textView.backgroundColor = globalConfig.bgColor
+    
+    textView.isEditable = false
+    textView.alignment = .left
+    
+    // get size of textView content. This works!
+    //        https://stackoverflow.com/questions/11237622/using-autolayout-with-expanding-nstextviews/14469815#14469815
+    textView.layoutManager?.ensureLayout(for: container)
+    let sz = textView.layoutManager?.usedRect(for: container).size
+//    let sz = NSMakeSize(200, 200)
+    
+    textView.heightAnchor.constraint(greaterThanOrEqualToConstant: (sz?.height)!).isActive = true
+    // does this one even make a difference?
+    textView.widthAnchor.constraint(greaterThanOrEqualToConstant: ((sz?.width)! + 20)).isActive = true
+    
+    return textView
 }
 
 // pass in local styles, or global styles?
@@ -499,7 +604,7 @@ func h1(content: String, globalConfig: GlobalConfig) -> String {
     
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "#", with: "")
-    return "<h1 style=\"\(style)\">\(trimContent)</h1>"
+    return "<span style=\"\(style)\">\(trimContent)</span>"
 }
 
 func h2(content: String, globalConfig: GlobalConfig) -> String {
@@ -510,7 +615,7 @@ func h2(content: String, globalConfig: GlobalConfig) -> String {
     
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "##", with: "")
-    return "<h2 style=\"\(style)\">\(trimContent)</h1>"
+    return "<span style=\"\(style)\">\(trimContent)</span>"
 }
 
 func h3(content: String, globalConfig: GlobalConfig) -> String {
@@ -521,7 +626,7 @@ func h3(content: String, globalConfig: GlobalConfig) -> String {
     
     // FIXME: Only replace this at beginning of line...
     let trimContent = content.replacingOccurrences(of: "###", with: "")
-    return "<h3 style=\"\(style)\">\(trimContent)</h1>"
+    return "<span style=\"\(style)\">\(trimContent)</span>"
 }
 
 // bullets
@@ -567,6 +672,8 @@ func inheritStyles() {
 // TODO: move this to subClass or model, or slides.swift or separate class file or something...
 
 // TODO: add default bg color...
+// NOT BEING USED RIGHT NOW...
+// FIXME: REMOVE...
 func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
     
     //rgb: 106, 215, 152
@@ -669,7 +776,8 @@ func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
     let stackView = NSStackView(views: [title, field])
     
     // make them take up an equal amount of space
-    stackView.distribution = .fillEqually
+//    stackView.distribution = .fillEqually
+    
     
     // make the views line up vertically
     stackView.orientation = .vertical
@@ -720,6 +828,8 @@ func makeFormattedView(title: String, bgColor: NSColor) -> NSView {
     
     //stackView.setFrameSize(NSSize(width: 200, height: 200))
     //stackView.setBoundsSize(NSSize(width: 200, height: 200))
+    
+    
     
     return stackView
     
@@ -844,6 +954,8 @@ func parseCSSRules(ruleStr: String) -> NSMutableDictionary {
         if (result.count > 1) {
             key = String(result[0]).trim()
             val = String(result[1]).trim()
+            // strip quotes (like on font families...
+            val = val.replacingOccurrences(of: "\"", with: "")
             dict[key] = val
         }
     }
@@ -897,8 +1009,12 @@ func hexStringToNSColor (hex:String) -> NSColor {
         cString.remove(at: cString.startIndex)
     }
     
+    if (cString.hasSuffix(";")) { // strip ; from end... FIXME: find a better way to do that?
+        cString = cString.replacingOccurrences(of: ";", with: "")
+    }
+    
     // Deal with 3 character Hex strings
-    if hex.count == 3 {
+    if cString.count == 3 {
         let redHex   = cString.first!
         let greenHex = cString[cString.index(after: cString.startIndex)] // FIXME: is this really the best way to get the 2nd value?!?!?!
         let blueHex  = cString.last!

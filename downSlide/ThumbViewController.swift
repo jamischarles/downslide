@@ -50,10 +50,10 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
 //        askForProjectFolderPermissions()
 //        saveFolderAccessPermissions()
         
-        print("### VIEW WILL APPEAR")
-        print("document.slides", document.slides)
-        print("document.slides.count", document.slides.count)
-        print("document.fileContent", document.fileContent)
+//        print("### VIEW WILL APPEAR")
+//        print("document.slides", document.slides)
+//        print("document.slides.count", document.slides.count)
+//        print("document.fileContent", document.fileContent)
         slides = document.slides
         
         /*
@@ -126,9 +126,9 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     
     override func viewDidLoad() {
-        print("### ViewDidLoad")
+//        print("### ViewDidLoad")
         super.viewDidLoad()
-        print("### ViewDidLoad")
+//        print("### ViewDidLoad")
         
         
         
@@ -195,7 +195,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         slideItem.imageView?.image = slideThumbs[i] // set image thumbnail
         
         
-        print("### CYCLE collectionView")
+//        print("### CYCLE collectionView")
         
         
         
@@ -207,17 +207,17 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     // WHEN SELECTION CHANGES swap out the view
     func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
-        print("item selected", indexPaths)
+//        print("item selected", indexPaths)
         guard let splitVC = parent as? NSSplitViewController else { return }
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {
             //let item = indexPaths[0].item
-            print("indexes", collectionView.item(at: 1))
+//            print("indexes", collectionView.item(at: 1))
             let item = collectionView.item(at: 1) as? SlideThumb
             
             // TODO: selecetd from outlet
             
             let i = indexPaths.first?.item
-            print("i",i)
+//            print("i",i)
             //let newView = NSTextField(labelWithString: "new view Placeholder View") as NSView!
             
             detail.swapView(newView: slides[i!] as! NSView!)
@@ -302,7 +302,7 @@ extension ThumbViewController: NSCollectionViewDelegateFlowLayout {
         layout collectionViewLayout: NSCollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
         ) -> NSSize {
-        print("request size")
+//        print("request size")
         // Here we're telling that we want our cell width to
         // be equal to our collection view width
         // and height equals to 70
