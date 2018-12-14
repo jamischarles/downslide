@@ -16,6 +16,27 @@ class FlippedView: NSView {
     override var isFlipped: Bool { return true }
 }
 
+// center the content of the scrollview
+// https://stackoverflow.com/questions/22072105/how-do-you-get-nsscrollview-to-center-the-document-view-in-10-9-and-later
+class CenteredClipView:NSClipView{
+    override func constrainBoundsRect(_ proposedBounds: NSRect) -> NSRect {
+        
+        var rect = super.constrainBoundsRect(proposedBounds)
+        if let containerView = self.documentView {
+            
+            if (rect.size.width > containerView.frame.size.width) {
+                rect.origin.x = (containerView.frame.width - rect.width) / 2
+            }
+            
+            if(rect.size.height > containerView.frame.size.height) {
+                rect.origin.y = (containerView.frame.height - rect.height) / 2
+            }
+        }
+        
+        return rect
+    }
+}
+
 class DetailViewController: NSViewController {
     
     var subView:NSView!
@@ -33,9 +54,16 @@ class DetailViewController: NSViewController {
         
         
         
-        scrollView.documentView = someView
+        // set bg color for scrollview
+//        https://stackoverflow.com/questions/42778317/how-to-color-the-overshoot-background-of-an-nscollectionview/42817222
+        scrollView.contentView.backgroundColor = NSColor(red: 238/255, green: 238/255, blue: 238/255, alpha: 1)
+        scrollView.drawsBackground = true
         
-        scrollView.magnification = 1.0 // default
+        // set scrollView content
+        scrollView.documentView = someView
+        addDropShadow(view: someView!)
+        
+        scrollView.magnification = 0.5 // default
         //clipView.addSubview(someView!)
 //        subView = someView
     }
@@ -53,9 +81,14 @@ class DetailViewController: NSViewController {
         
         viewToShowNext.addSubview(newView)
         
+        viewToShowNext.wantsLayer = true
+        viewToShowNext.layer?.backgroundColor = NSColor.red.cgColor
+        
         
         
         scrollView.documentView = viewToShowNext
+        
+        addDropShadow(view: viewToShowNext)
 //        self.subView = newView
         
         // I assume it has to be in the View tree before I can apply these constraints...
@@ -128,6 +161,21 @@ class DetailViewController: NSViewController {
  
  */
  
+    }
+    
+    // https://stackoverflow.com/questions/32859617/how-to-display-shadow-for-nsview
+    func addDropShadow(view: NSView) {
+        view.wantsLayer = true
+        view.superview?.wantsLayer = true
+        view.wantsLayer = true
+        view.shadow = NSShadow()
+        view.layer?.backgroundColor = NSColor.red.cgColor
+        view.layer?.cornerRadius = 5.0
+        view.layer?.shadowOpacity = 1.0
+//        view.layer?.shadowColor = CGColor(red: 238/255, green: 238/255, blue: 238/255, alpha: 1)
+        view.layer?.shadowColor = NSColor.black.cgColor
+        view.layer?.shadowOffset = NSMakeSize(0, 0)
+        view.layer?.shadowRadius = 10
     }
     
 }
