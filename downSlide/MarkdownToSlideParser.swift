@@ -162,7 +162,7 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     let stackView = NSStackView(views: viewsArr)
     
     
-    let stack = NSStackView()
+    let stack = FlippedStackView()
     stack.setFrameSize(NSMakeSize(100, 100)) // has no effect?
     stack.orientation = .vertical
 //    stack.alignment = .top
@@ -1089,6 +1089,11 @@ extension String {
     
 }
 
+// needed so shrinking the stack view will cut off from the bottom instead of the top...
+//https://hk.saowen.com/a/19d014fbccc2040fa50535081155b385c2d92d077b796ebd8100f3c28733e961
+class FlippedStackView: NSStackView {
+    override var isFlipped: Bool { return true }
+}
 
 
 

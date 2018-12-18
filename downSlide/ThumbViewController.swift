@@ -117,7 +117,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         let currentSlideIndex = currentSelectedThumbs.first?.item // get currently selected index
         guard let splitVC = self.parent as? NSSplitViewController else { return }
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {
-            detail.swapView(newView: slides[currentSlideIndex!] as NSView!)
+            detail.swapView(newView: slides[currentSlideIndex!] as NSView)
         }
         
     }

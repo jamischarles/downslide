@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSSplitViewController, NSWindowDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +22,26 @@ class ViewController: NSViewController {
         }
     }
 
+    
+    @IBAction func zoomClicked(_ sender: NSSegmentedControl) {
+        // parent split controller view...
+        // this class is for splitViewController, so detailviewController is a child of this
+        
+        // if cannot assign detail, bail
+        guard let detailController = self.childViewControllers[1] as? DetailViewController else { return }
+        
+        if sender.selectedSegment == 0 {
+            detailController.zoomIn()
+        }
+        
+        if sender.selectedSegment == 1 {
+            detailController.resetZoom()
+        }
+        
+        if sender.selectedSegment == 2 {
+            detailController.zoomOut()
+        }
+        
+    }
 
 }
-

@@ -16,6 +16,7 @@ class FlippedView: NSView {
     override var isFlipped: Bool { return true }
 }
 
+
 // center the content of the scrollview
 // https://stackoverflow.com/questions/22072105/how-do-you-get-nsscrollview-to-center-the-document-view-in-10-9-and-later
 class CenteredClipView:NSClipView{
@@ -37,7 +38,9 @@ class CenteredClipView:NSClipView{
     }
 }
 
-class DetailViewController: NSViewController {
+class DetailViewController: NSViewController, NSWindowDelegate {
+    
+    var currentZoom: CGFloat  = 1.0
     
     var subView:NSView!
     
@@ -63,23 +66,27 @@ class DetailViewController: NSViewController {
         scrollView.documentView = someView
         addDropShadow(view: someView!)
         
-        scrollView.magnification = 0.5 // default
+        scrollView.magnification = currentZoom // default
         //clipView.addSubview(someView!)
 //        subView = someView
     }
     
     // FIXME: make the swapping way more elegant...
     func swapView(newView:NSView) {
+        
+        let stack = newView as! FlippedStackView
+        
+        
         // because we are using "replace" instead of addSubview() it doesn't keep just adding more sibling views that stack
         // on top of each other. It removes the prior one with the assumption that the detail page should only show 1 view
         // at a time...
-//        clipView.replaceSubview(subView, with: newView)
+//        clipView.replaceSubview(subView, with: stack)
         
         // prep clipping boundaries for new view about to be inserted
         let viewToShowNext = FlippedView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
          // overflow = hidden
         
-        viewToShowNext.addSubview(newView)
+        viewToShowNext.addSubview(stack)
         
         viewToShowNext.wantsLayer = true
         viewToShowNext.layer?.backgroundColor = NSColor.red.cgColor
@@ -88,8 +95,9 @@ class DetailViewController: NSViewController {
         
         scrollView.documentView = viewToShowNext
         
+        
         addDropShadow(view: viewToShowNext)
-//        self.subView = newView
+//        self.subView = stack
         
         // I assume it has to be in the View tree before I can apply these constraints...
         
@@ -98,27 +106,62 @@ class DetailViewController: NSViewController {
         mainView.setFrameSize(NSMakeSize(1024.0, 768.0)) // 4:3 Aspec Ratio (standard)
         mainView.setBoundsSize(NSMakeSize(1024.0, 768.0))
         
-        newView.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
+        stack.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
         // this forces the content to change size to fit this constraint. Do NOT set nsstackview height
         // via constraints. It needs to be set via the contents...
-//        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+//        stack.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
         
-//        applySlideConstraints(slideView: newView as! NSStackView, mainView: view)
+        // limit height to 768 (so slide clips thet stackView
+        stack.heightAnchor.constraint(lessThanOrEqualToConstant: 768).isActive = true
+        
+//        applySlideConstraints(slideView: stack as! NSStackView, mainView: view)
         
         
         // manual constraints?
-        newView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        newView.topAnchor.constraint(equalTo: (self.view.superview?.topAnchor)!).isActive = true
+        stack.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        stack.topAnchor.constraint(equalTo: (self.view.superview?.topAnchor)!).isActive = true
         
 
-//        newView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+//        stack.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
 //        mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
         
         // makes no diff? Can't tell...
-//        newView.setFrameSize(NSMakeSize(1024.0, 768.0))
+//        stack.setFrameSize(NSMakeSize(1024.0, 768.0))
         
-        newView.translatesAutoresizingMaskIntoConstraints = false
+        stack.translatesAutoresizingMaskIntoConstraints = false
         
+        
+        // causes clipping, but order still wrong
+//        stack.setClippingResistancePriority(.required, for: .vertical)
+        
+        // right order, but stops clipping
+//        stack.setClippingResistancePriority(.defaultHigh, for: .vertical)
+        
+//        stack.setContentCompressionResistancePriority(.required, for: .vertical) // no effect?
+        
+//        clipView.setFrameSize(NSMakeSize(1024.0, 768.0))
+        
+        
+        // ensure that shrinking the stackView (if overflow) hides bottom items, not top items
+        
+//        var i = stack.arrangedSubviews.count
+        
+        /*
+        var i = 1
+        for view in stack.arrangedSubviews {
+            stack.setVisibilityPriority(.init(Float(i)), for: view)
+            i = i+1
+        }
+ */
+        
+        // this is how you can hide a stackview item...
+//        stack.setVisibilityPriority(.notVisible, for: stack.arrangedSubviews[stack.arrangedSubviews.count-1])
+        
+        // doesn't seem to help force showing...
+//        stack.setVisibilityPriority(.mustHold, for: stack.arrangedSubviews[0])
+//        i = i+1
+        
+        //(_ priority: NSStackView.VisibilityPriority,for view: NSView)
         
         
     }
@@ -178,6 +221,26 @@ class DetailViewController: NSViewController {
         view.layer?.shadowRadius = 10
     }
     
+    func zoomIn() {
+        scrollView.magnification = currentZoom + 0.25
+        currentZoom = scrollView.magnification
+    }
+    
+    func zoomOut() {
+        scrollView.magnification = currentZoom - 0.25
+        currentZoom = scrollView.magnification
+    }
+    
+    func resetZoom() {
+        scrollView.magnification = 1.0
+        currentZoom = scrollView.magnification
+    }
+
+    
 }
+
+
+
+
 
 

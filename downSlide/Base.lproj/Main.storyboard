@@ -742,12 +742,64 @@
                                 <toolbarItem implicitItemIdentifier="NSToolbarPrintItem" id="Hkf-c8-KlN"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="7ag-o1-nT2"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="xrU-se-3Iz"/>
+                                <toolbarItem implicitItemIdentifier="C33E6F49-E4FB-4294-8938-FE5B8EF4DECA" label="Zoom" paletteLabel="Custom View" id="gkk-OW-PPQ">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="100" height="28"/>
+                                    <size key="maxSize" width="100" height="28"/>
+                                    <segmentedControl key="view" verticalHuggingPriority="750" springLoaded="YES" id="dSt-9q-gM5" customClass="ZoomButtonGroup" customModule="downSlide" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="14" width="100" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="93P-uU-Bg4">
+                                            <font key="font" metaFont="system" size="8"/>
+                                            <segments>
+                                                <segment image="NSAddTemplate" width="32"/>
+                                                <segment label="100%" width="32" tag="1"/>
+                                                <segment image="NSRemoveTemplate" width="32"/>
+                                            </segments>
+                                        </segmentedCell>
+                                        <connections>
+                                            <action selector="zoomClicked:" target="6f7-a7-6o1" id="Mwr-N0-68c"/>
+                                        </connections>
+                                    </segmentedControl>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="2132311D-D9B4-45DE-9D19-7FCCA5F4BB6E" label="Custom View" paletteLabel="Custom View" id="RyV-we-qjc">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="100" height="28"/>
+                                    <size key="maxSize" width="100" height="28"/>
+                                    <segmentedControl key="view" verticalHuggingPriority="750" id="p5N-Kh-zi7">
+                                        <rect key="frame" x="0.0" y="14" width="100" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="selectOne" id="1ZR-d4-Q7d">
+                                            <font key="font" metaFont="system"/>
+                                            <segments>
+                                                <segment width="32"/>
+                                                <segment width="32" selected="YES" tag="1"/>
+                                                <segment width="32">
+                                                    <nil key="label"/>
+                                                </segment>
+                                            </segments>
+                                        </segmentedCell>
+                                    </segmentedControl>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="5D43ED61-E0DC-4EA4-A778-F4DB57C67A10" label="Custom View" paletteLabel="Custom View" id="N2E-kT-s8A">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="127" height="25"/>
+                                    <size key="maxSize" width="127" height="25"/>
+                                    <button key="view" verticalHuggingPriority="750" id="ECJ-sU-jqG">
+                                        <rect key="frame" x="0.0" y="14" width="127" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" title="Textured Rounded" bezelStyle="texturedRounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JBv-PM-2IQ">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="OKg-L4-i9S"/>
                                 <toolbarItem reference="efk-c0-yn8"/>
                                 <toolbarItem reference="xrU-se-3Iz"/>
-                                <toolbarItem reference="Hkf-c8-KlN"/>
+                                <toolbarItem reference="gkk-OW-PPQ"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -762,10 +814,10 @@
             </objects>
             <point key="canvasLocation" x="75" y="250"/>
         </scene>
-        <!--Split View Controller-->
+        <!--View Controller-->
         <scene sceneID="vQB-lX-PM5">
             <objects>
-                <splitViewController id="VxV-UN-JOg" sceneMemberID="viewController">
+                <splitViewController id="VxV-UN-JOg" customClass="ViewController" customModule="downSlide" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
                         <splitViewItem id="653-2z-UBw"/>
                         <splitViewItem id="D2h-Qd-Pm0"/>
@@ -894,4 +946,8 @@
             <point key="canvasLocation" x="757" y="730"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
+    </resources>
 </document>
