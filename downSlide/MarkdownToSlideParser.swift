@@ -163,7 +163,7 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     
     
     let stack = FlippedStackView()
-    stack.setFrameSize(NSMakeSize(100, 100)) // has no effect?
+//    stack.setFrameSize(NSMakeSize(600, 600)) // this is usually overridden by other constraints.
     stack.orientation = .vertical
 //    stack.alignment = .top
     stack.distribution = .fill
@@ -171,8 +171,19 @@ private func parseStringToSlideView(_ str: String, globalConfig: GlobalConfig) -
     stackView.wantsLayer = true
     stack.layer?.backgroundColor = globalConfig.bgColor.cgColor
     
-    for view in viewsArr {
+    for (i,view) in viewsArr.enumerated() {
         stack.addArrangedSubview(view)
+        
+        // change constraint priority
+//        let priority = Float(viewsArr.count - i)
+        let priority = Float(900 - i)
+        
+        
+        for con in view.constraints {
+            con.priority = .init(rawValue: priority)
+        }
+//        view.constraints[0].priority = .init(rawValue: priority)
+//        view.constraints[1].priority = .init(rawValue: priority)
     }
     
 //    stack.addArrangedSubview(viewsArr[1])
@@ -411,6 +422,7 @@ func makeImageFromMDString(content: String, globalConfig: GlobalConfig) -> NSIma
     let docPath = docFilePath.absoluteString.replacingOccurrences(of: "file://", with: "")
     
     let imageView = ImageViewFromMD()
+    imageView.frame = NSMakeRect(0, 0, 400, 400)
 //    imageView.image = NSImage(contentsOfFile: "/Users/jacharles/Dropbox/dev/mac_playground/downSlide/cat-small-face.jpg")
     
     // FIXME: create more foolproof way of doing this. Like node has path joining methods
@@ -429,7 +441,7 @@ func makeImageFromMDString(content: String, globalConfig: GlobalConfig) -> NSIma
 
     // set slide bg color
     //stackView.layer?.backgroundColor = bgColor.cgColor
-    imageView.layer?.backgroundColor = NSColor.red.cgColor
+    imageView.layer?.backgroundColor = NSColor.brown.cgColor
     
     
     
@@ -478,6 +490,27 @@ func makeImageFromMDString(content: String, globalConfig: GlobalConfig) -> NSIma
 //    imageView.frame = NSRect(x: 300, y: 300, width: 300, height: 200) // matters a LOT
     
     //imageView.image = resize(image: imageView.image!, w: 200, h: 500)
+    
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.setFrameSize(NSMakeSize(200, 200))
+    imageView.frame = NSMakeRect(0, 0, 200, 200)
+    
+    let c1 = imageView.heightAnchor.constraint(greaterThanOrEqualToConstant: 200)
+    c1.isActive = true
+    c1.priority = NSLayoutConstraint.Priority(rawValue: 1000.0)
+    c1.identifier = "IMAGEVIEW-h"
+    
+    let c2 = imageView.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)//.isActive = true
+    c2.isActive = true
+    c2.priority = NSLayoutConstraint.Priority(rawValue: 1000.0)
+    c2.identifier = "IMAGEVIEW-w"
+    
+    
+//    imageView.image.heightAnchor.constraint(lessThanOrEqualTo÷Constant: 200).isActive = true
+//    imageView.image.widthAnchor.constraint(lessThanOrEqualToCo÷nstant: 200).isActive = true
+    
+    Swift.print("### imageView frame", imageView.frame)
+    Swift.print("### image size", imageView.image?.size)
     
     
     return imageView
@@ -585,12 +618,20 @@ func makeTextField(content: String, type:String, globalConfig: GlobalConfig) -> 
     // get size of textView content. This works!
     //        https://stackoverflow.com/questions/11237622/using-autolayout-with-expanding-nstextviews/14469815#14469815
     textView.layoutManager?.ensureLayout(for: container)
+    
+    
     let sz = textView.layoutManager?.usedRect(for: container).size
 //    let sz = NSMakeSize(200, 200)
     
-    textView.heightAnchor.constraint(greaterThanOrEqualToConstant: (sz?.height)!).isActive = true
+    let c1 = textView.heightAnchor.constraint(greaterThanOrEqualToConstant: (sz?.height)!)
+    c1.isActive = true
+    c1.identifier = "\(content) height"
     // does this one even make a difference?
-    textView.widthAnchor.constraint(greaterThanOrEqualToConstant: ((sz?.width)! + 20)).isActive = true
+    let c2 = textView.widthAnchor.constraint(greaterThanOrEqualToConstant: ((sz?.width)! + 20))
+    c2.isActive = true
+    c2.identifier = "\(content) width"
+    
+    
     
     return textView
 }

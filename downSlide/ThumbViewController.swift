@@ -40,63 +40,64 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     // proper time to access the data in document... !!!! YES!!!
     //
     override func viewWillAppear() {
+        // FIXME: check if we have permissions already... (needed to load images, and other folder assets)
+        loadSavedFolderAccessPermissions() // we'll need to check here and see if we have to ask for perms again
+        //        askForProjectFolderPermissions()
+        //        saveFolderAccessPermissions()
+        
+       updateLeftRailImages()
+    }
+    
+    func slidesHaveUpdated() {
+        updateLeftRailImages()
+    }
+    
+    // on inital load and any time file changes, update left rail thumbs
+    func updateLeftRailImages() {
+        
+        guard let splitVC = parent as? NSSplitViewController else { return }
+        guard let detail = splitVC.childViewControllers[1] as? DetailViewController else { return }
         
         // select the folder for image rights
         // FIXME: lazy load this later...
         //NSOpenPanel().selectFolder
-        
-        // FIXME: check if we have permissions already...
-        loadSavedFolderAccessPermissions() // we'll need to check here and see if we have to ask for perms again
-//        askForProjectFolderPermissions()
-//        saveFolderAccessPermissions()
-        
-//        print("### VIEW WILL APPEAR")
-//        print("document.slides", document.slides)
-//        print("document.slides.count", document.slides.count)
-//        print("document.fileContent", document.fileContent)
-        slides = document.slides
-        
-        /*
-        slides.append(makeFormattedView(title: "We just changed tables to divs"))
-        slides.append(makeFormattedView(title: "Sweet 2nd slide!"))
-        slides.append(makeFormattedView(title: "Noice! 3rd slide!!!"))
- */
-        
-        // generate thumbnails
-        
-        for slide in slides {
-            slideThumbs.append(slide.image())
-            //slideThumbs.append(slides[1].image())
-        }
-        
-        // reload sidear data
-        collectionView.reloadData()
-    }
-    
-    func slidesHaveUpdated() {
+
         slides = document.slides
         
         // wipe out slide thumbs
         slideThumbs = []
-        
-        
+    
+        // generate thumbnails
         for slide in slides {
-            slideThumbs.append(slide.image())
-            //slideThumbs.append(slides[1].image())
+            let viewToSnap: NSView = detail.generateDetailSlide(newView: slide)
+            
+            
+            // reverse flip coordinate system (FIXME: figure out some manual ways to do this...)
+            // coordinate system is messed up somehow...
+            let oldStack = viewToSnap.subviews[0] as! NSStackView
+            let stack = FlippedStackView()
+            
+            // manually copy over the views so they don't get removed from origin place
+            for view in oldStack.arrangedSubviews {
+                let archivedView = NSKeyedArchiver.archivedData(withRootObject: view)
+                let myViewCopy = NSKeyedUnarchiver.unarchiveObject(with: archivedView)
+                stack.addArrangedSubview(myViewCopy as! NSView)
+            }
+            
+            
+            let viewToShowNext = FlippedView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
+            viewToShowNext.addSubview(viewToSnap)
+            
+            slideThumbs.append(stack.image())
         }
         
-        // reload sidebar data
+        // reload sidear data
         collectionView.reloadData()
         
-        // reload the currently active master slide (reload the same index)
-        // TODO: get current active from controllerViewItem?
         
-        /*
-        guard let splitVC = self.parent as? NSSplitViewController else { return }
-        if let detail = splitVC.childViewControllers[1] as? DetailViewController {
-            detail.swapView(newView: slides[2] as NSView!)
-        }
-         */
+        // ONLY USED for refreshes (update selected slide, reload selecion etc)
+        
+        
         // FIXME BUG: change the scroll position to be dynamic to the prior selection
         // https://stackoverflow.com/questions/35207364/how-do-i-programmatically-select-an-object-and-have-that-object-show-as-selecte
         
@@ -112,56 +113,17 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
         collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)
         
-        //return
         // reload the currently displayed slide (if any? Maybe just force current selection)
         let currentSlideIndex = currentSelectedThumbs.first?.item // get currently selected index
-        guard let splitVC = self.parent as? NSSplitViewController else { return }
+    
         if let detail = splitVC.childViewControllers[1] as? DetailViewController {
             detail.swapView(newView: slides[currentSlideIndex!] as NSView)
         }
-        
     }
     
     
-    
-    
     override func viewDidLoad() {
-//        print("### ViewDidLoad")
         super.viewDidLoad()
-//        print("### ViewDidLoad")
-        
-        
-        
-        //print("document content", document.getFileContent())
-        // Do view setup here.
-       
-        /*
-        slides.append(makeFormattedView(title: "We just changed tables to divs"))
-        slides.append(makeFormattedView(title: "Sweet 2nd slide!"))
-        slides.append(makeFormattedView(title: "Noice! 3rd slide!!!"))
- */
-        
-        
-
-        
-        //guard let splitVC = parent as? NSSplitViewController else { return }
-        //let splitVC = parent as? NSSplitViewController
-        
-    
-        
-        // NOT WORKING :(
-        /*
-        var document: Document {
-            let oughtToBeDocument = self.view.window?.windowController?.document as? Document
-            assert(oughtToBeDocument != nil, "Unable to find the document for this view controller.")
-            return oughtToBeDocument!
-        }*/
-        
-        
-        
-        
-        //print("document content", document.getFileContent())
-        
     }
     
 
@@ -263,6 +225,7 @@ extension NSView {
     ///
     /// - Returns: `NSImage` of view
     
+    
     func image() -> NSImage {
         //self.draw(NSRect(x: 0, y: 0, width: 600, height: 600))
         
@@ -271,7 +234,7 @@ extension NSView {
         // needed bc bounds are zero since it hasn't been rendered into the window yet...
         
         // FIXME: this should be set to the size of the slide (Use a constant size...)
-        self.frame = NSRect(x: 0, y: 0, width: 1200, height: 1200) // THIS becomes the bounds...
+        self.frame = NSRect(x: 0, y: 0, width: 1200, height: 768) // THIS becomes the bounds...
         //self.translatesAutoresizingMaskIntoConstraints = true // this forces the constraints to be reset, but it's not strictly needed for our purposes. Mainly we need the frame to change so that bounds isn't 0!
         
         //self.setNeedsDisplay(NSRect(x: 0, y: 0, width: 200, height: 200))
@@ -283,6 +246,7 @@ extension NSView {
          self.setBoundsSize(NSSize(width: 200, height: 200))
          self.setFrameSize(NSSize(width: 200, height: 200))
          */
+    
         
         //self.layer = CALayer(); self.wantsLayer = true
         let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
@@ -290,6 +254,231 @@ extension NSView {
         return NSImage(cgImage: imageRepresentation.cgImage!, size: bounds.size)
         
         
+    }
+    
+    // BACKUP. We don't really need this. Hold on to itt for now for the other image processing stuff...
+    func image2() -> NSImage {
+        //self.draw(NSRect(x: 0, y: 0, width: 600, height: 600))
+        
+        let width2:CGFloat = 1024.0
+        let height2:CGFloat = 768.0
+        
+//        let bm = NSBitmapImageRep(focusedViewRect: NSRect(x: 0, y: 0, width: 600, height: 600))
+        
+//        self.bitmapImageRepForCachingDisplayInRect
+        let bm = self.bitmapImageRepForCachingDisplay(in: NSRect(x: 0, y: 0, width: width2, height: height2))
+        
+        self.cacheDisplay(in: NSRect(x: 0, y: 0, width: width2, height: height2), to: bm!)
+        
+        
+//
+//        bm?.pixelsWide = Int(width2 / 7.0)
+//        bm?.pixelsHigh = Int(height2 / 7.0)
+       
+        
+
+        
+        let bma = NSImage()
+        bma.addRepresentation(bm!)
+        //
+        
+        
+        let name2 = "test.png"
+//        let folder = NSTemporaryDirectory()
+                let folder = "/Users/jacharles/Dropbox/dev/downslide_examples/jack_franklin"
+//        let folder2 = "/Users/jacharles/Dropbox/dev/mac_playground/downSlide/downSlide"
+        let url = URL(fileURLWithPath: folder).appendingPathComponent(name2)
+        
+        // save to file
+//      https://stackoverflow.com/questions/3038820/how-to-save-a-nsimage-as-a-new-file
+        let tiffRepresentation = bm?.tiffRepresentation
+        let data = tiffRepresentation
+        let rep = NSBitmapImageRep(data: data!)
+        let imgData = rep?.representation(using: .png, properties: [.compressionFactor : NSNumber(floatLiteral: 1.0)]) //else {
+                
+//                Swift.print("\(self.self) Error Function '\(#function)' Line: \(#line) No tiff rep found for image writing to \(url)")
+                
+        
+        
+        do {
+            try imgData?.write(to: url)
+        }catch let error {
+            Swift.print("\(self.self) Error Function '\(#function)' Line: \(#line) \(error.localizedDescription)")
+            askForProjectFolderPermissions() // FIXME: check for proper err
+        }
+        
+        Swift.print("img LOCATION:", url)
+        
+        return bma
+        
+//        width = [bm pixelsWide];
+//        height = [bm pixelsHigh];
+//
+//        CGDataProviderRef provider = CGDataProviderCreateWithData( bm, [bm bitmapData], rowBytes * height, BitmapReleaseCallback );
+//        CGColorSpaceRef colorspace = CGColorSpaceCreateWithName( kCGColorSpaceGenericRGB );
+//        CGBitmapInfo    bitsInfo = kCGImageAlphaPremultipliedLast;
+//
+//        CGImageRef img = CGImageCreate( width, height, 8, 32, rowBytes, colorspace, bitsInfo, provider, NULL, NO, kCGRenderingIntentDefault );
+//
+//        CGDataProviderRelease( provider );
+//        CGColorSpaceRelease( colorspace );
+//
+//        return img;
+
+        
+        
+        
+        
+        
+        
+        
+        // TOOD: read this more...
+        // https://stackoverflow.com/questions/4516191/rendering-nsview-containing-some-calayers-to-an-nsimage
+        let i = NSImage(size: self.frame.size)
+//        let i = NSImage(size: self.frame.size, flipped: false, drawingHandler: noop)
+        
+        
+        i.lockFocus()
+        
+        if self.lockFocusIfCanDraw(in: NSGraphicsContext.current!) {
+            
+        
+            self.displayIgnoringOpacity(self.frame, in: NSGraphicsContext.current!)
+            //[view displayRectIgnoringOpacity:[view frame] inContext:[NSGraphicsContext currentContext]];
+        
+            self.unlockFocus()
+        }
+        
+        i.unlockFocus()
+        
+        // FIXME: test this out better...?
+        let d: NSData = i.tiffRepresentation! as NSData
+//        d.write(toFile: "/Users/jacharles/Dropbox/dev/mac_playground/downSlide/test.tiff", atomically: false)
+//        let url = URL(fileURLWithPath: "/Users/jacharles/Dropbox/dev/downslide_examples/jack_franklin/test.tiff", isDirectory: false)
+        
+        
+        
+        
+        let name = "test.tiff"
+//        let folder = NSTemporaryDirectory()
+//        let folder = "/Users/jacharles/Dropbox/dev/downslide_examples/jack_franklin"
+        let folder3 = "/Users/jacharles/Dropbox/dev/mac_playground/downSlide/downSlide"
+        let url3 = URL(fileURLWithPath: folder3).appendingPathComponent(name)
+        
+        
+        Swift.print("URL", url3)
+        
+        do {
+            try d.write(to: url3, atomically: false)
+            
+        } catch {
+            print("Error info: \(error)")
+            askForProjectFolderPermissions()
+        }
+        
+        
+//        d.write(toFile: "/Users/jacharles/Dropbox/dev/downslide_examples/jack_franklin/test.tiff", atomically: true)
+        
+        
+        
+        
+        
+        /*
+        NSData * d = [i TIFFRepresentation];
+        [d writeToFile:@"/path/to/my/test.tiff" atomically:YES];
+        [i release];
+ */
+        
+        
+//        CGWindowListCreateImage(<#T##screenBounds: CGRect##CGRect#>, <#T##listOption: CGWindowListOption##CGWindowListOption#>, <#T##windowID: CGWindowID##CGWindowID#>, <#T##imageOption: CGWindowImageOption##CGWindowImageOption#>)
+        
+        
+//        CGImageRef cgimg = CGWindowListCreateImage(CGRectZero, kCGWindowListOptionIncludingWindow, [theWindow windowNumber], kCGWindowImageDefault)
+       
+        
+        // this resets the first slide view... interesting... because the new constraints haven't been applied yet...
+        // https://stackoverflow.com/questions/36732958/how-to-move-or-resize-an-nsview-by-setting-the-frame-property
+        // needed bc bounds are zero since it hasn't been rendered into the window yet...
+        
+        // FIXME: this should be set to the size of the slide (Use a constant size...)
+        let width3:CGFloat = 1024.0
+        let height3:CGFloat = 768.0
+        
+        
+        
+//        https://stackoverflow.com/questions/23626526/how-to-convert-pdf-to-nsimage-and-change-the-dpi
+//        https://www.hackingwithswift.com/example-code/core-graphics/how-to-render-a-pdf-to-an-image
+        let pdfData = self.dataWithPDF(inside: NSRect(x: 0, y: 0, width: width3, height: height3))
+        
+        
+//        CGWindowListCreateImage(pdfData, <#CGWindowListOption#>)
+        
+        let im = NSPDFImageRep(data: pdfData)
+        
+        im?.pixelsWide = Int(width3 / 7.0)
+        im?.pixelsHigh = Int(height3 / 7.0)
+        
+        
+//        let im = NSImage(size: im?.size, flipped: false, drawingHandler: <#T##(NSRect) -> Bool#>)
+//        NSImage * image = [[NSImage alloc] initWithSize:[imageRep size]];
+//        [image addRepresentation: imageRep];
+        
+        
+        
+        
+//        self.frame = NSRect(x: 0, y: 0, width: width, height: height) // THIS becomes the bounds...
+//        self.setFrameSize(NSMakeSize(width, height))
+
+        
+        //self.translatesAutoresizingMaskIntoConstraints = true // this forces the constraints to be reset, but it's not strictly needed for our purposes. Mainly we need the frame to change so that bounds isn't 0!
+        
+//        self.setNeedsDisplay(NSRect(x: 0, y: 0, width: 200, height: 200))
+        
+       
+        
+        
+        
+        
+//        self resize(withOldSuperviewSize: NSSize)
+        
+        
+        self.display()
+        
+        /*
+         self.display()
+         self.setBoundsSize(NSSize(width: 200, height: 200))
+         self.setFrameSize(NSSize(width: 200, height: 200))
+         */
+        
+        //self.layer = CALayer(); self.wantsLayer = true
+        
+        
+        
+//        let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
+//        cacheDisplay(in: bounds, to: imageRepresentation)
+//        return NSImage(cgImage: imageRepresentation.cgImage!, size: bounds.size)
+//
+        
+//
+//        let ima = NSImage()
+//        ima.addRepresentation(im!)
+//
+//        return ima
+//
+        
+        
+        
+        
+        
+        return NSImage(data: d as Data)!
+        
+    }
+    
+
+    
+    
+    func noop(rect:CGRect) -> Bool {
+        return false
     }
     
 }
@@ -315,4 +504,9 @@ extension ThumbViewController: NSCollectionViewDelegateFlowLayout {
     
     // [self.collectionView setMaxItemSize:NSZeroSize];
 }
+
+
+
+
+
 

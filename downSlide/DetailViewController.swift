@@ -40,7 +40,7 @@ class CenteredClipView:NSClipView{
 
 class DetailViewController: NSViewController, NSWindowDelegate {
     
-    var currentZoom: CGFloat  = 1.0
+    var currentZoom: CGFloat  = 0.25
     
     var subView:NSView!
     
@@ -73,96 +73,28 @@ class DetailViewController: NSViewController, NSWindowDelegate {
     
     // FIXME: make the swapping way more elegant...
     func swapView(newView:NSView) {
-        
-        let stack = newView as! FlippedStackView
-        
-        
-        // because we are using "replace" instead of addSubview() it doesn't keep just adding more sibling views that stack
-        // on top of each other. It removes the prior one with the assumption that the detail page should only show 1 view
-        // at a time...
-//        clipView.replaceSubview(subView, with: stack)
-        
-        // prep clipping boundaries for new view about to be inserted
-        let viewToShowNext = FlippedView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
-         // overflow = hidden
-        
-        viewToShowNext.addSubview(stack)
-        
-        viewToShowNext.wantsLayer = true
-        viewToShowNext.layer?.backgroundColor = NSColor.red.cgColor
-        
-        
-        
+       
+        let viewToShowNext = generateDetailSlide(newView: newView)
+//        let stack = viewToShowNext.subviews[0]
         scrollView.documentView = viewToShowNext
         
         
+        
+        
         addDropShadow(view: viewToShowNext)
-//        self.subView = stack
         
-        // I assume it has to be in the View tree before I can apply these constraints...
+        let stack = viewToShowNext.subviews[0] as! NSStackView
         
-        // set size of view...
-        // Or bounds?
-        mainView.setFrameSize(NSMakeSize(1024.0, 768.0)) // 4:3 Aspec Ratio (standard)
-        mainView.setBoundsSize(NSMakeSize(1024.0, 768.0))
+//        for (i,view) in stack.arrangedSubviews.enumerated() {
         
-        stack.widthAnchor.constraint(greaterThanOrEqualToConstant: 1024).isActive = true
-        // this forces the content to change size to fit this constraint. Do NOT set nsstackview height
-        // via constraints. It needs to be set via the contents...
-//        stack.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
-        
-        // limit height to 768 (so slide clips thet stackView
-        stack.heightAnchor.constraint(lessThanOrEqualToConstant: 768).isActive = true
-        
-//        applySlideConstraints(slideView: stack as! NSStackView, mainView: view)
-        
-        
-        // manual constraints?
-        stack.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        stack.topAnchor.constraint(equalTo: (self.view.superview?.topAnchor)!).isActive = true
-        
-
-//        stack.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
-//        mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
-        
-        // makes no diff? Can't tell...
-//        stack.setFrameSize(NSMakeSize(1024.0, 768.0))
-        
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        // causes clipping, but order still wrong
-//        stack.setClippingResistancePriority(.required, for: .vertical)
-        
-        // right order, but stops clipping
-//        stack.setClippingResistancePriority(.defaultHigh, for: .vertical)
-        
-//        stack.setContentCompressionResistancePriority(.required, for: .vertical) // no effect?
-        
-//        clipView.setFrameSize(NSMakeSize(1024.0, 768.0))
-        
-        
-        // ensure that shrinking the stackView (if overflow) hides bottom items, not top items
-        
-//        var i = stack.arrangedSubviews.count
-        
-        /*
-        var i = 1
-        for view in stack.arrangedSubviews {
-            stack.setVisibilityPriority(.init(Float(i)), for: view)
-            i = i+1
-        }
- */
-        
-        // this is how you can hide a stackview item...
-//        stack.setVisibilityPriority(.notVisible, for: stack.arrangedSubviews[stack.arrangedSubviews.count-1])
-        
-        // doesn't seem to help force showing...
-//        stack.setVisibilityPriority(.mustHold, for: stack.arrangedSubviews[0])
-//        i = i+1
-        
-        //(_ priority: NSStackView.VisibilityPriority,for view: NSView)
-        
+//            let length = stack.arrangedSubviews.count
+//            let priority = Float(length - i) // highest priority for lowest items
+            
+//            for con in view.constraints {
+//                con.priority = .init(rawValue: priority)
+//            }
+            
+//        }
         
     }
     
@@ -183,27 +115,6 @@ class DetailViewController: NSViewController, NSWindowDelegate {
         slideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
         slideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
         
-        /*
-        
-        
-        // FIXME: Do we need to apply all the constraints and all these transformations when we show it only?
-        
-        // add these contraints after adding the stackview as a subview
-        // make the stack view sit directly against all four edges
-        slideView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        slideView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true // don't center it, and limit the width
-        
-        slideView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        //slideView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        
-        // set the width of the stackview container to 800 so things aren't cut off...
-        //slideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
-        
-        // left/right padding 50%
-        slideView.edgeInsets = NSEdgeInsets(top:200,left:NSWidth(view.bounds) / 2, bottom: 200,right:NSWidth(view.bounds) / 2)
- 
- */
- 
     }
     
     // https://stackoverflow.com/questions/32859617/how-to-display-shadow-for-nsview
@@ -234,6 +145,140 @@ class DetailViewController: NSViewController, NSWindowDelegate {
     func resetZoom() {
         scrollView.magnification = 1.0
         currentZoom = scrollView.magnification
+    }
+    
+    var originY: CGFloat = 0
+    
+    // constraints applied in here, will be used for detail, and for thumbnail for greater accuracy...
+    func generateDetailSlide(newView:NSView) -> FlippedStackView {
+        
+        let rawStack = newView as! FlippedStackView
+        rawStack.identifier = NSUserInterfaceItemIdentifier(rawValue: "RAWSTACK###")
+
+//        rawStack.setFrameSize(NSMakeSize(200, 400)) // sets thumb window, but has no effect on detail constraint
+        // ### THIS IS WHERE THE IMPORTANT STUFF IS HAPPENING
+//        rawStack.heightAnchor.constraint(equalToConstant: 300.0).isActive = true
+//        rawStack.widthAnchor.constraint(equalToConstant: 500.0).isActive = true
+        
+//        rawStack.heightAnchor.constraint(lessThanOrEqualToConstant: 1300.0).isActive = true
+//        rawStack.widthAnchor.constraint(lessThanOrEqualToConstant: 1500.0).isActive = true
+        
+        
+        // When it gets too big, the constraintst freak out...
+        
+        
+        // this changes things, not sure if good or bad... bad bc it changes thumb from slide...
+//        rawStack.setClippingResistancePriority(.fittingSizeCompression, for: .vertical)
+//        rawStack.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
+        if (rawStack.frame.size.height > 768) {
+            rawStack.heightAnchor.constraint(lessThanOrEqualToConstant: 768).isActive = true
+        }
+        
+        rawStack.widthAnchor.constraint(lessThanOrEqualToConstant: 1024).isActive = true
+        
+
+//        rawStack.needsLayout = true
+//        rawStack.display()
+        Swift.print("needsLayout", rawStack.layoutGuides)
+        
+        for (i,view) in rawStack.arrangedSubviews.enumerated() {
+//            Swift.print("### Frame", view.frame)
+//            Swift.print("### Bounds", view.bounds)
+//            view.widthAnchor.constraint(equalToConstant: 700.0)
+            let length = rawStack.arrangedSubviews.count
+            let priority = Float(length - i) // highest priority for lowest items
+            // hide any beyond 4
+        
+//            view.setContentCompressionResistancePriority(.init(rawValue: priority * 1000), for: .vertical)
+//            view.exerciseAmbiguityInLayout() // try this?!?
+//            Swift.print("##constraint##", view.constraints)
+//            view.constraints[0].priority = .init(rawValue: priority)
+//            view.constraints[1].priority = .init(rawValue: priority)
+//            Swift.print("priority", priority)
+//            rawStack.setVisibilityPriority(.init(rawValue: priority), for: view)
+            
+            
+        }
+
+//        rawStack.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        
+//        rawStack.detachesHiddenViews = false
+        Swift.print("detached", rawStack.detachedViews)
+//        rawStack.setClippingResistancePriority(.init(rawValue: 1.0), for: .vertical)
+        Swift.print("clippingResistance", rawStack.clippingResistancePriority(for: .vertical))
+        
+//                rawStack.layout()
+//                rawStack.updateConstraints()
+        rawStack.layoutSubtreeIfNeeded() // THIS is the magic property... Causing height to be calculated properly, and thus Y frameOrigin as well... tough tough tough
+        
+        let v = FlippedStackView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
+        v.addSubview(rawStack)
+        
+        
+        
+
+//        v.translatesAutoresizingMaskIntoConstraints = true
+//        rawStack.translatesAutoresizingMaskIntoConstraints = true
+//        v.heightAnchor.constraint(lessThanOrEqualToConstant: 768).isActive = true
+//
+        
+        rawStack.wantsLayer = true
+//        v.layer?.masksToBounds = true
+        
+        return v
+        
+        let stack = NSStackView()
+        
+        
+        for view in rawStack.arrangedSubviews {
+            stack.addArrangedSubview(view)
+            // Q: Is this an intrinsic size issue bc it hasn't been rendered to screen yet?
+//            view.setFrameOrigin(NSMakePoint(0, originY))
+//            originY = originY + 200
+            
+        }
+        
+        
+        // because we are using "replace" instead of addSubview() it doesn't keep just adding more sibling views that stack
+        // on top of each other. It removes the prior one with the assumption that the detail page should only show 1 view
+        // at a time...
+        //        clipView.replaceSubview(subView, with: stack)
+        
+        // prep clipping boundaries for new view about to be inserted
+        let viewToShowNext = FlippedView(frame: NSMakeRect(0, 0, 1024.0, 768.0))
+        viewToShowNext.identifier = NSUserInterfaceItemIdentifier(rawValue: "viewToShowNext###")
+        // overflow = hidden
+        
+        
+        
+        
+        viewToShowNext.addSubview(stack)
+        
+        viewToShowNext.wantsLayer = true
+        viewToShowNext.layer?.backgroundColor = NSColor.red.cgColor
+        
+        // PRINT the dimensions
+        Swift.print("### Frame", viewToShowNext.frame)
+        Swift.print("### Bounds", viewToShowNext.bounds)
+        
+        
+        // ADD constraints?
+        viewToShowNext.heightAnchor.constraint(equalToConstant: 700.0)
+        stack.constraintsAffectingLayout(for: .vertical)
+        viewToShowNext.translatesAutoresizingMaskIntoConstraints = false
+        viewToShowNext.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        
+        
+        stack.frame = NSMakeRect(0, 0, 1024.0, 768.0)
+        stack.bounds = NSMakeRect(0, 0, 1024.0, 768.0)
+        Swift.print("### Stack Frame", stack.frame)
+        Swift.print("### Stack Bounds", stack.bounds)
+        
+        Swift.print("## stack subviews", stack.arrangedSubviews)
+        
+//        return viewToShowNext
+        
     }
 
     
