@@ -130,9 +130,9 @@ class ThumbViewController: NSViewController, NSSplitViewDelegate, NSCollectionVi
         
         
         // if no slide is selected trying to get the selection back...
-        // FIXME: SHould we just default to first slide?
         if currentSelectedThumbs == nil {
-            return
+            currentSelectedThumbs = [[0, 0]] // select first slide if none selected (when app first loads)
+//            return
         }
         
         collectionView.selectItems(at: currentSelectedThumbs, scrollPosition: NSCollectionView.ScrollPosition.top)

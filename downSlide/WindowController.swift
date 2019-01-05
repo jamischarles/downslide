@@ -36,8 +36,13 @@ class WindowController: NSWindowController {
         // FIXME: squelch the sound
         
         if isPresenting && event.keyCode == 53 {
+//            guard let thumb = splitViewController.childViewControllers[0] as? ThumbViewController else { return }
+            
             print("WINDOW ESCAPE")
             togglePresentationMode(self)
+            // FIXME: consider only restoring selection if too sluggish
+//            thumb.updateLeftRailImages() // will reload left rail, and restore selectiton
+            
         } else {
             print("WINDOW FALL THROUGH")
         }
