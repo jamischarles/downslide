@@ -10,11 +10,14 @@
 // TODO: keep reading the Chapters in the book on SafariBooks. It'll tell me more about master/detail
 
 import Cocoa
+import Foundation
 
-class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSCollectionViewDelegate {
+class ThumbViewController: NSViewController, NSSplitViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegate, NSCollectionViewDelegateFlowLayout {
     
     @IBOutlet var collectionView: NSCollectionView!
     
+    // placeholder closure so we can change it in viewDidLoad for debounced fn
+    var splitViewHasResized = { print ("Told you I return nothing")}
     
     
     // make all the slides here...
@@ -25,9 +28,6 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     // keep track of currently selected thumb so we can re-select it after reload due to file change
     var currentSelectedThumbs: Set<IndexPath>! // will only be one, but it's a set of selection
-    
-
-    
  
     // Hacky way to access the file data for now...
     // LATER: use bindings and fancy ways to do this. for now this hacky way works fine
@@ -37,6 +37,30 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         return oughtToBeDocument!
     }
     
+    /**
+     Wraps a function in a new function that will throttle the execution to once in every `delay` seconds.
+     
+     - Parameter delay: A `TimeInterval` specifying the number of seconds that needst to pass between each execution of `action`.
+     - Parameter queue: The queue to perform the action on. Defaults to the main queue.
+     - Parameter action: A function to throttle.
+     
+     - Returns: A new function that will only call `action` once every `delay` seconds, regardless of how often it is called.
+     */
+    func throttle(delay: TimeInterval, queue: DispatchQueue = .main, action: @escaping (() -> Void)) -> () -> Void {
+        var currentWorkItem: DispatchWorkItem?
+        var lastFire: TimeInterval = 0
+        return {
+            guard currentWorkItem == nil else { return }
+            currentWorkItem = DispatchWorkItem {
+                action()
+                lastFire = Date().timeIntervalSinceReferenceDate
+                currentWorkItem = nil
+            }
+            delay.hasPassed(since: lastFire) ? queue.async(execute: currentWorkItem!) : queue.asyncAfter(deadline: .now() + delay, execute: currentWorkItem!)
+        }
+    }
+    
+
     // proper time to access the data in document... !!!! YES!!!
     //
     override func viewWillAppear() {
@@ -124,8 +148,39 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // FIXME: make this WAY WAY more efficient so it doesn't result in huge (but short) CPU spikes...
+        self.splitViewHasResized = throttle(delay: 0.1, queue: DispatchQueue.global(qos: .background), action: refreshThumbsAfterResize)
+        
+        
+        // https://stackoverflow.com/questions/11262080/nssplitview-and-autolayout
+//        self.view.widthAnchor.constraint(equalToConstant: 400).isActive = true
+//        CONSTRAIN the left rail
+        self.view.widthAnchor.constraint(lessThanOrEqualToConstant: 600).isActive = true
+        
     }
     
+//    var closureName: () -> nil = throttle(delay: 0.4, queue: DispatchQueue.global(qos: .background), action: splitViewHasResized2)
+    
+    
+    
+    // called from ViewController.swift
+    // FIXME: MUST BE DEBOUNCED...
+    func refreshThumbsAfterResize() {
+//        https://willowtreeapps.com/ideas/dynamic-sizing-for-horizontal-uicollectionviews
+//        flowLayout.invalidateLayout()
+        
+         Swift.print("RESIZE####")
+        // run the refresh on the main thread
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+        
+
+    }
+
+    
+
 
     // TODO: rethink if we should create objects here, or create a model that can be shared by the document and this?
     // READ this to figure that out...
@@ -147,7 +202,7 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         guard let slideItem = item as? SlideThumb else { return item }
         
         slideItem.view.wantsLayer = true
-        slideItem.view.layer?.backgroundColor = NSColor.red.cgColor
+        slideItem.view.layer?.backgroundColor = NSColor.brown.cgColor
         
         slideItem.index = indexPath
         let i = indexPath.item
@@ -155,6 +210,8 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
         // slideItem.slideContent = slides[i] // we aren't using this...
         slideItem.imageView?.image = slideThumbs[i] // set image thumbnail
+        slideItem.imageView?.alignment = .right
+        slideItem.imageView?.imageAlignment = .alignTopLeft
         
         
 //        print("### CYCLE collectionView")
@@ -165,6 +222,25 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
         
         
         return slideItem
+    }
+    
+    // dynamically size collectionView items
+    func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        Swift.print("SIZING####")
+        //return CGSize(width: collectionView.frame.height / 6 * 5, height: collectionView.frame.height / 6 * 5)
+        let width = collectionView.frame.width / 6 * 5 // FIXME: not ideal
+        let height = width / (4/3) // keep 4:3 aspect ratio. 4/3 - 1.333333
+        return CGSize(width: width, height: height)
+        
+//        Swift.print("collectionView.frame", collectionView.frame)
+        
+//        let width = 1024.0 / 10
+//        let height = 768.0 / 10
+        
+//        return CGSize(width: width, height: height)
+        
+        
     }
     
     // WHEN SELECTION CHANGES swap out the view
@@ -190,21 +266,20 @@ class ThumbViewController: NSViewController, NSCollectionViewDataSource, NSColle
     }
     
     // SET SIZE for collection view item
+    
     /*
-     func collectionView(
-     _ collectionView: NSCollectionView,
-     layout collectionViewLayout: NSCollectionViewLayout,
-     sizeForItemAt indexPath: IndexPath
+     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayoutsizeForItemAt indexPath: IndexPath
      ) -> NSSize {
      // Here we're telling that we want our cell width to
      // be equal to our collection view width
      // and height equals to 70
      // return CGSize(width: collectionView.bounds.width, height: 70)
-     print("SET SIZE")
+        print("### SET SIZE")
      // THIS FN is not being called...
-     return CGSize(width: 400, height: 400)
-     }*/
-    
+        return CGSize(width: 400, height: 400)
+     }
+ 
+ */
     
     
     
@@ -234,7 +309,7 @@ extension NSView {
         // needed bc bounds are zero since it hasn't been rendered into the window yet...
         
         // FIXME: this should be set to the size of the slide (Use a constant size...)
-        self.frame = NSRect(x: 0, y: 0, width: 1200, height: 768) // THIS becomes the bounds...
+        self.frame = NSRect(x: 0, y: 0, width: 1024, height: 768) // THIS becomes the bounds...
         //self.translatesAutoresizingMaskIntoConstraints = true // this forces the constraints to be reset, but it's not strictly needed for our purposes. Mainly we need the frame to change so that bounds isn't 0!
         
         //self.setNeedsDisplay(NSRect(x: 0, y: 0, width: 200, height: 200))
@@ -312,6 +387,7 @@ extension NSView {
         return bma
         
 //        width = [bm pixelsWide];
+        
 //        height = [bm pixelsHigh];
 //
 //        CGDataProviderRef provider = CGDataProviderCreateWithData( bm, [bm bitmapData], rowBytes * height, BitmapReleaseCallback );
@@ -484,13 +560,14 @@ extension NSView {
 }
 
 // CHANGE DEFAULT SIZE for CollectionViewItem
+// SET THUMBNAIL SIZE!!!!
 // http://wavvel.com/posts/swift/macos/full-width-ns-collection-view-item/
-extension ThumbViewController: NSCollectionViewDelegateFlowLayout {
-    func collectionView(
-        _ collectionView: NSCollectionView,
-        layout collectionViewLayout: NSCollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath
-        ) -> NSSize {
+//extension ThumbViewController: NSCollectionViewDelegateFlowLayout {
+//    func collectionView(
+//        _ collectionView: NSCollectionView,
+//        layout collectionViewLayout: NSCollectionViewLayout,
+//        sizeForItemAt indexPath: IndexPath
+//        ) -> NSSize {
 //        print("request size")
         // Here we're telling that we want our cell width to
         // be equal to our collection view width
@@ -499,14 +576,61 @@ extension ThumbViewController: NSCollectionViewDelegateFlowLayout {
         
         // FIXME: Use a method that is called when the dimensions change of the parent?
         //return CGSize(width: NSWidth(view.bounds), height: NSWidth(view.bounds))
-        return CGSize(width: 150, height: 150)
-    }
+        
+        
+        /*
+        let width = 1024.0 / 10
+        let height = 768.0 / 10
+        
+        return CGSize(width: width, height: height)
+ */
+    //}
     
     // [self.collectionView setMaxItemSize:NSZeroSize];
+//}
+
+
+// FIXME: Move this to utils folder/file/class or "Debouncer.swift" file?
+// debounce that we need for the resize event
+// https://stackoverflow.com/questions/27116684/how-can-i-debounce-a-method-call
+//https://github.com/webadnan/swift-debouncer
+class Debouncer: NSObject {
+    var callback: (() -> ())
+    var delay: Double
+    weak var timer: Timer?
+    
+    init(delay: Double, callback: @escaping (() -> ())) {
+        self.delay = delay
+        self.callback = callback
+    }
+    
+    func call() {
+        timer?.invalidate()
+        let nextTimer = Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(Debouncer.fireNow), userInfo: nil, repeats: false)
+        timer = nextTimer
+    }
+    
+    @objc func fireNow() {
+        self.callback()
+    }
 }
 
 
 
+
+extension TimeInterval {
+    
+    /**
+     Checks if `since` has passed since `self`.
+     
+     - Parameter since: The duration of time that needs to have passed for this function to return `true`.
+     - Returns: `true` if `since` has passed since now.
+     */
+    func hasPassed(since: TimeInterval) -> Bool {
+        return Date().timeIntervalSinceReferenceDate - self > since
+    }
+    
+}
 
 
 

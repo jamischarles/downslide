@@ -819,8 +819,8 @@
             <objects>
                 <splitViewController id="VxV-UN-JOg" customClass="ViewController" customModule="downSlide" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
-                        <splitViewItem id="653-2z-UBw"/>
-                        <splitViewItem id="D2h-Qd-Pm0"/>
+                        <splitViewItem canCollapse="YES" holdingPriority="260" behavior="sidebar" id="653-2z-UBw"/>
+                        <splitViewItem holdingPriority="255" behavior="contentList" id="D2h-Qd-Pm0"/>
                     </splitViewItems>
                     <splitView key="splitView" dividerStyle="thin" vertical="YES" id="wK4-cP-uSl">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
@@ -857,7 +857,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="448" height="158"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="zDq-j2-16M">
-                                                <size key="itemSize" width="50" height="50"/>
+                                                <size key="itemSize" width="250" height="250"/>
                                             </collectionViewFlowLayout>
                                             <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <connections>

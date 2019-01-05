@@ -8,12 +8,31 @@
 
 import Cocoa
 
+// FIXME: Rename splitViewContrller? FIXME: do we need the last two?
 class ViewController: NSSplitViewController, NSWindowDelegate {
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+//        guard let thumbController = self.childViewControllers[0] as? DetailViewController else { return }
+//        guard let detailController = self.childViewControllers[1] as? DetailViewController else { return }
+//        
+//        
+//        // NOT WORKING
+//        let con = thumbController.view.widthAnchor.constraint(lessThanOrEqualToConstant: 400.0)
+//        con.isActive = true
+//        con.priority = NSLayoutConstraint.Priority(rawValue: 1000)
+//        
+//        
+//        // NOT WORKING
+//        let split = thumbController.parent as! NSSplitViewController
+//        split.splitView(split.splitView, constrainMinCoordinate: CGFloat(200), ofSubviewAt: 0)
+//        print("SPLIT", split.splitView(minPossiblePositionOfDivider(at: 0))
+        
+//        split.view.splitView(thumbController, constrainMinCoordinate: CGFloat(100.0), ofSubviewAt: 0)
     }
 
     override var representedObject: Any? {
@@ -23,6 +42,7 @@ class ViewController: NSSplitViewController, NSWindowDelegate {
     }
 
     
+    // FIXME: is this even being used? Remove?!?
     @IBAction func zoomClicked(_ sender: NSSegmentedControl) {
         // parent split controller view...
         // this class is for splitViewController, so detailviewController is a child of this
@@ -43,5 +63,12 @@ class ViewController: NSSplitViewController, NSWindowDelegate {
         }
         
     }
-
+    
+    // called when we resize thet split view
+    // Called VERY often... figure out a debounce method...
+    override func splitViewDidResizeSubviews(_ notification: Notification) {
+        guard let thumbController = self.childViewControllers[0] as? ThumbViewController else { return }
+        
+        thumbController.splitViewHasResized()
+    }
 }
