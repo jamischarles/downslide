@@ -112,8 +112,8 @@ class DetailViewController: NSViewController, NSWindowDelegate {
         //stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
         // set the width of the stackview container to 800 so things aren't cut off...
-        slideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
-        slideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 800).isActive = true
+        slideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
+        slideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 768).isActive = true
         
     }
     

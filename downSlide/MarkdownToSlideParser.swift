@@ -601,12 +601,14 @@ func makeTextField(content: String, type:String, globalConfig: GlobalConfig) -> 
     // FIXME: this seems to be the width that matters...
     
     // if this is too small, it'll clip the tex inside...
-    let container:NSTextContainer = NSTextContainer(containerSize: NSMakeSize(800, 400))
+    // containerSize shrinks to content inside. these #s provide the max size. Must match slide size.
+    let container:NSTextContainer = NSTextContainer(containerSize: NSMakeSize(1024, 768))
     // tie it all together so text shows up
     textStorage.addLayoutManager(manager)
     manager.addTextContainer(container)
     
     // appears to have no effect? These sizes don't seem to matter...
+    // probably overridden by other constraints (w/h for textField below?)
     let windowFrame:NSRect = NSRect(x: 0, y: 0, width: 800, height: 200)
     let textView:NSTextView = NSTextView(frame: windowFrame, textContainer: container)
     //let lightBlue = NSColor(red:79/255, green:191/255, blue:203/255, alpha:1.000)
@@ -623,10 +625,12 @@ func makeTextField(content: String, type:String, globalConfig: GlobalConfig) -> 
     let sz = textView.layoutManager?.usedRect(for: container).size
 //    let sz = NSMakeSize(200, 200)
     
+    // FIXME: consider setting intrinsic height instead for these...
     let c1 = textView.heightAnchor.constraint(greaterThanOrEqualToConstant: (sz?.height)!)
     c1.isActive = true
     c1.identifier = "\(content) height"
     // does this one even make a difference?
+//    let c2 = textView.widthAnchor.constraint(greaterThanOrEqualToConstant: CGFloat(1024))
     let c2 = textView.widthAnchor.constraint(greaterThanOrEqualToConstant: ((sz?.width)! + 20))
     c2.isActive = true
     c2.identifier = "\(content) width"
