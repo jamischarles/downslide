@@ -170,7 +170,7 @@ class ThumbViewController: NSViewController, NSSplitViewDelegate, NSCollectionVi
 //        https://willowtreeapps.com/ideas/dynamic-sizing-for-horizontal-uicollectionviews
 //        flowLayout.invalidateLayout()
         
-         Swift.print("RESIZE####")
+//         Swift.print("RESIZE####")
         // run the refresh on the main thread
         DispatchQueue.main.async {
             self.collectionView.reloadData()
@@ -227,7 +227,7 @@ class ThumbViewController: NSViewController, NSSplitViewDelegate, NSCollectionVi
     // dynamically size collectionView items
     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        Swift.print("SIZING####")
+//        Swift.print("SIZING####")
         //return CGSize(width: collectionView.frame.height / 6 * 5, height: collectionView.frame.height / 6 * 5)
         let width = collectionView.frame.width / 6 * 5 // FIXME: not ideal
         let height = width / (4/3) // keep 4:3 aspect ratio. 4/3 - 1.333333

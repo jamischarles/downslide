@@ -9,24 +9,28 @@
 import Cocoa
 
 // FIXME: Rename splitViewContrller? FIXME: do we need the last two?
-class ViewController: NSSplitViewController, NSWindowDelegate {
+class SplitViewController: NSSplitViewController, NSWindowDelegate {
+ 
     
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        self.becomeFirstResponder()
+        
+        
         // Do any additional setup after loading the view.
         
 //        guard let thumbController = self.childViewControllers[0] as? DetailViewController else { return }
 //        guard let detailController = self.childViewControllers[1] as? DetailViewController else { return }
-//        
-//        
+//
+//
 //        // NOT WORKING
 //        let con = thumbController.view.widthAnchor.constraint(lessThanOrEqualToConstant: 400.0)
 //        con.isActive = true
 //        con.priority = NSLayoutConstraint.Priority(rawValue: 1000)
-//        
-//        
+//
+//
 //        // NOT WORKING
 //        let split = thumbController.parent as! NSSplitViewController
 //        split.splitView(split.splitView, constrainMinCoordinate: CGFloat(200), ofSubviewAt: 0)
@@ -64,6 +68,7 @@ class ViewController: NSSplitViewController, NSWindowDelegate {
         
     }
     
+
     // called when we resize thet split view
     // Called VERY often... figure out a debounce method...
     override func splitViewDidResizeSubviews(_ notification: Notification) {

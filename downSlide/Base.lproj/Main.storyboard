@@ -729,7 +729,7 @@
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
-                <windowController storyboardIdentifier="Document Window Controller" id="jGA-0Y-lOj" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="Document Window Controller" id="jGA-0Y-lOj" customClass="WindowController" customModule="downSlide" customModuleProvider="target" sceneMemberID="viewController">
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="Ckk-yw-fiv">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -781,23 +781,27 @@
                                         </segmentedCell>
                                     </segmentedControl>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="5D43ED61-E0DC-4EA4-A778-F4DB57C67A10" label="Custom View" paletteLabel="Custom View" id="N2E-kT-s8A">
+                                <toolbarItem implicitItemIdentifier="5D43ED61-E0DC-4EA4-A778-F4DB57C67A10" label="" paletteLabel="" id="N2E-kT-s8A">
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="127" height="25"/>
                                     <size key="maxSize" width="127" height="25"/>
                                     <button key="view" verticalHuggingPriority="750" id="ECJ-sU-jqG">
                                         <rect key="frame" x="0.0" y="14" width="127" height="25"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" title="Textured Rounded" bezelStyle="texturedRounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JBv-PM-2IQ">
+                                        <buttonCell key="cell" type="roundTextured" title="Full Screen" bezelStyle="texturedRounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JBv-PM-2IQ">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="togglePresentationMode" target="6f7-a7-6o1" id="7z0-Cb-ywr"/>
+                                        </connections>
                                     </button>
                                 </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="OKg-L4-i9S"/>
                                 <toolbarItem reference="efk-c0-yn8"/>
+                                <toolbarItem reference="N2E-kT-s8A"/>
                                 <toolbarItem reference="xrU-se-3Iz"/>
                                 <toolbarItem reference="gkk-OW-PPQ"/>
                             </defaultToolbarItems>
@@ -814,10 +818,10 @@
             </objects>
             <point key="canvasLocation" x="75" y="250"/>
         </scene>
-        <!--View Controller-->
+        <!--Split View Controller-->
         <scene sceneID="vQB-lX-PM5">
             <objects>
-                <splitViewController id="VxV-UN-JOg" customClass="ViewController" customModule="downSlide" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController id="VxV-UN-JOg" customClass="SplitViewController" customModule="downSlide" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
                         <splitViewItem canCollapse="YES" holdingPriority="260" behavior="sidebar" id="653-2z-UBw"/>
                         <splitViewItem holdingPriority="255" behavior="contentList" id="D2h-Qd-Pm0"/>
