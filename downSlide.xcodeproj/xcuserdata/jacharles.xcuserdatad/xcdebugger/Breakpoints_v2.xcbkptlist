@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.9436539"
+            timestampString = "569060698.430083"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1101"
@@ -90,7 +90,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.944066"
+            timestampString = "569060698.430153"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "899"
@@ -106,7 +106,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.944348"
+            timestampString = "569060698.430199"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "970"
@@ -122,7 +122,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.944631"
+            timestampString = "569060698.43024"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "962"
@@ -138,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.944905"
+            timestampString = "569060698.430282"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "938"
@@ -154,7 +154,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.945168"
+            timestampString = "569060698.430323"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1043"
@@ -170,7 +170,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.945434"
+            timestampString = "569060698.430361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "939"
@@ -186,7 +186,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.945695"
+            timestampString = "569060698.4304"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "999"
@@ -202,7 +202,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.945956"
+            timestampString = "569060698.430438"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "127"
@@ -218,7 +218,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.946219"
+            timestampString = "569060698.430476"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "648"
@@ -234,7 +234,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.946494"
+            timestampString = "569060698.430513"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "900"
@@ -250,13 +250,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/ThumbViewController.swift"
-            timestampString = "568403116.069661"
+            timestampString = "571165435.841665"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
-            landmarkName = "ThumbViewController"
-            landmarkType = "3">
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "updateLeftRailImages()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -266,7 +266,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.9471689"
+            timestampString = "569060698.431869"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "958"
@@ -282,7 +282,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.947473"
+            timestampString = "569060698.4319251"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "378"
@@ -298,7 +298,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.947734"
+            timestampString = "569060698.4319659"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "390"
@@ -314,7 +314,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.9479851"
+            timestampString = "569060698.432005"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "373"
@@ -330,7 +330,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.948241"
+            timestampString = "569060698.432044"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "335"
@@ -346,7 +346,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.948495"
+            timestampString = "569060698.432083"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "124"
@@ -378,7 +378,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.948824"
+            timestampString = "569060698.432176"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "548"
@@ -394,7 +394,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.949195"
+            timestampString = "569060698.432218"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "415"
@@ -410,7 +410,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.94959"
+            timestampString = "569060698.4322571"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "424"
@@ -426,7 +426,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.9498529"
+            timestampString = "569060698.432296"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "422"
@@ -442,7 +442,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.950119"
+            timestampString = "569060698.432335"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1053"
@@ -458,7 +458,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.9503911"
+            timestampString = "569060698.432373"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "904"
@@ -495,7 +495,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.950677"
+            timestampString = "569060698.432412"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "625"
@@ -511,7 +511,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.950963"
+            timestampString = "569060698.4324501"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "605"
@@ -569,7 +569,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.951233"
+            timestampString = "569060698.432488"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "414"
@@ -585,7 +585,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/MarkdownToSlideParser.swift"
-            timestampString = "568363663.951511"
+            timestampString = "569060698.432529"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "181"
@@ -601,13 +601,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/ThumbViewController.swift"
-            timestampString = "568403116.071671"
+            timestampString = "571165435.848397"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "242"
-            endingLineNumber = "242"
-            landmarkName = "collectionView(_:layout:sizeForItemAt:)"
-            landmarkType = "7">
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "ThumbViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -617,12 +617,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "downSlide/ThumbViewController.swift"
-            timestampString = "568403116.072208"
+            timestampString = "571165435.849322"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "233"
-            endingLineNumber = "233"
-            landmarkName = "collectionView(_:layout:sizeForItemAt:)"
+            startingLineNumber = "259"
+            endingLineNumber = "259"
+            landmarkName = "collectionView(_:didSelectItemsAt:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -659,32 +659,16 @@
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "downSlide/WindowController.swift"
-            timestampString = "568403116.072831"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "38"
-            endingLineNumber = "38"
-            landmarkName = "keyUp(with:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.SymbolicBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             symbolName = "NSBeep"
             moduleName = "">
             <Locations>
                <Location
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "NSBeep"
@@ -693,6 +677,38 @@
                   offsetFromSymbolStart = "0">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "downSlide/ThumbViewController.swift"
+            timestampString = "571165435.8502769"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "181"
+            endingLineNumber = "181"
+            landmarkName = "ThumbViewController"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "downSlide/ThumbViewController.swift"
+            timestampString = "571165435.851034"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
+            landmarkName = "ThumbViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
